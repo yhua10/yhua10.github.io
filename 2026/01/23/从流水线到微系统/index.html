@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从流水线到微系统 | Dried Mushroom's Cinema</title><meta name="author" content="Dried Mushroom"><meta name="copyright" content="Dried Mushroom"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="经过 P6，我们已经得到了一个功能较为齐全且正确（假设）的流水线 Cpu（💀瑟瑟发抖了），然而它现在还存在两个很严重的问题：一是鲁棒性不足，code 有错误就寄了；二是无法与外界交互，只能运行预制的代码。 在这一节，我们要把从 P6 带来的 Cpu 封装成一个可与外界交互的微系统，并增添异常处理功能。 约定： 本文中提到的 异常 均为 Cpu 运行代码时发生的异常，中断 均为来自外界（Timer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从流水线到微系统">
+<meta property="og:url" content="http://example.com/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="Dried Mushroom&#39;s Cinema">
+<meta property="og:description" content="经过 P6，我们已经得到了一个功能较为齐全且正确（假设）的流水线 Cpu（💀瑟瑟发抖了），然而它现在还存在两个很严重的问题：一是鲁棒性不足，code 有错误就寄了；二是无法与外界交互，只能运行预制的代码。 在这一节，我们要把从 P6 带来的 Cpu 封装成一个可与外界交互的微系统，并增添异常处理功能。 约定： 本文中提到的 异常 均为 Cpu 运行代码时发生的异常，中断 均为来自外界（Timer">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png">
+<meta property="article:published_time" content="2026-01-23T15:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-23T15:25:50.819Z">
+<meta property="article:author" content="Dried Mushroom">
+<meta property="article:tag" content="CO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "从流水线到微系统",
+  "url": "http://example.com/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/",
+  "image": "https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png",
+  "datePublished": "2026-01-23T15:00:00.000Z",
+  "dateModified": "2026-01-23T15:25:50.819Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Dried Mushroom",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/asd.jpg"><link rel="canonical" href="http://example.com/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从流水线到微系统',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><style>
+  /* =================================================
+     第一部分：【首页文章卡片】单独控制 (0.6)
+     这里是专门控制 Home 上的卡片的，确保它变透
+     ================================================= */
+  #recent-posts .recent-post-item {
+    /* 0.6 代表 60% 不透明度 */
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(6px);
+  }
+
+  /* =================================================
+     第二部分：【侧边栏 & 底部页码】 (0.6)
+     ================================================= */
+  .aside-content .card-widget,
+  #pagination {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(6px);
+  }
+
+  /* =================================================
+     第三部分：【文章正文 & 归档页】 (0.6)
+     这里比较实，为了看清字
+     ================================================= */
+  #post,
+  .layout > .post,
+  .layout > #archive,
+  .layout > #category,
+  .layout > #tag,
+  .layout > #page { 
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(6px);
+  }
+
+  /* =================================================
+     第四部分：【头像卡片特权】 (暖金色)
+     ================================================= */
+  .aside-content .card-info {
+     background-color: rgba(238, 189, 113, 0.6) !important;
+  }
+
+  /* =================================================
+     第五部分：【暗黑模式适配】
+     ================================================= */
+  [data-theme="dark"] #recent-posts > .recent-post-item,
+  [data-theme="dark"] .aside-content .card-widget,
+  [data-theme="dark"] #pagination,
+  [data-theme="dark"] #post,
+  [data-theme="dark"] .layout > .post,
+  [data-theme="dark"] .layout > #archive,
+  [data-theme="dark"] .layout > #category,
+  [data-theme="dark"] .layout > #tag,
+  [data-theme="dark"] .layout > #page {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+  }
+  /* =================================================
+     第六部分：【搜索框】透明与毛玻璃 (0.6)
+     ================================================= */
+  /* 1. 搜索框背景遮罩 (就是弹出来时后面那一层) */
+  #search-mask {
+    background: rgba(0, 0, 0, 0.3) !important; /* 调低遮罩黑度 */
+  }
+
+  /* 2. 搜索对话框本体 */
+  #local-search .search-dialog {
+    background: rgba(255, 255, 255, 0.6) !important; /* 保持 0.6 透明度 */
+    backdrop-filter: blur(10px) !important; /* 毛玻璃效果 */
+    border-radius: 12px; /* 稍微圆润一点，不想要圆角可以删掉此行 */
+  }
+
+  /* 3. 暗黑模式下的搜索对话框 */
+  [data-theme="dark"] #local-search .search-dialog {
+    background: rgba(0, 0, 0, 0.5) !important; /* 暗黑模式稍深一点 */
+    backdrop-filter: blur(10px) !important;
+  }
+
+  /* 4. 消除搜索框底部的白色背景阴影 */
+  #local-search .search-dialog .local-search-input {
+    background: transparent !important;
+  }
+</style>
+<meta name="generator" content="Hexo 8.1.1"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(https://cdn.luogu.com.cn/upload/image_hosting/nd2rvok8.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/owl.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/0imlaf2y.png" alt="Logo"><span class="site-name">Dried Mushroom's Cinema</span></a><a class="nav-page-title" href="/"><span class="site-name">从流水线到微系统</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">从流水线到微系统</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-01-23T15:00:00.000Z" title="Created 2026-01-23 23:00:00">2026-01-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-01-23T15:25:50.819Z" title="Updated 2026-01-23 23:25:50">2026-01-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CO/">CO</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>13mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>经过 P6，我们已经得到了一个功能较为齐全且正确（假设）的流水线 <code>Cpu</code>（💀瑟瑟发抖了），然而它现在还存在两个很严重的问题：一是鲁棒性不足，<code>code</code> 有错误就寄了；二是无法与外界交互，只能运行预制的代码。</p>
+<p>在这一节，我们要把从 P6 带来的 <code>Cpu</code> 封装成一个可与外界交互的微系统，并增添异常处理功能。</p>
+<h5 id="约定："><a href="#约定：" class="headerlink" title="约定："></a>约定：</h5><ul>
+<li><p>本文中提到的 <strong>异常</strong> 均为 <code>Cpu</code> 运行代码时发生的异常，<strong>中断</strong> 均为来自外界（<code>Timer</code> 和 <code>tb</code>）的中断，这是两个完全不同的概念，<strong>异常中断</strong> 是指 <strong>异常</strong> 与 <strong>中断</strong>，而非异常造成的中断或者别的什么。</p>
+</li>
+<li><p><code>Cp0</code> 置于 <code>M</code> 级（后面会解释为什么）。</p>
+</li>
+<li><p>我的实现宗旨并非能转发尽转发，我只处理了我认为恰当的转发。涉及到可以转发但我认为没必要的会说明，保证我的实现不会超时，但不保证把我提到的转发全部实现不会因运行周期过少而无法通过。</p>
+</li>
+<li><p>我采用分布式译码，涉及到集中式译码和分布式译码有差别的我会尽可能说明。</p>
+</li>
+<li><p>我管控制单元（有人叫 <code>Ctrl Unit</code> 或者 <code>CU</code>）叫 <code>Mainctrl_X</code></p>
+</li>
+</ul>
+<hr>
+<h4 id="这里提供一种可行的实现顺序"><a href="#这里提供一种可行的实现顺序" class="headerlink" title="这里提供一种可行的实现顺序"></a>这里提供一种可行的实现顺序</h4><ul>
+<li><p>实现各流水级的异常判定逻辑，产出异常码，并流水至 <code>M</code> 级 （我的 <code>Cp0</code> 所在级别）</p>
+</li>
+<li><p>实现内部异常的容忍：这是汇报异常同时在产出异常的流水级执行的操作 </p>
+</li>
+<li><p>实现 <code>Cp0</code></p>
+</li>
+<li><p>陷入内核</p>
+<ul>
+<li>流水 <code>BD</code> </li>
+<li>实现各级流水线（其实是 <code>Dm</code>、<code>Mdu</code>、<code>Grf</code>）对 <code>Req</code> 的响应</li>
+<li>调整流水线寄存器的清空逻辑（<code>reset &gt; Req &gt; stall/flush</code>）</li>
+<li>跳转到异常处理程序</li>
+</ul>
+</li>
+<li><p>桥与整体架构（<code>mips.v</code>）</p>
+</li>
+<li><p>加指令（<code>syscall</code>、<code>nop</code>、<code>mfc0</code>、<code>mtc0</code>、<code>eret</code>）</p>
+</li>
+</ul>
+<h4 id="异常判定逻辑（最简单一步）与流水"><a href="#异常判定逻辑（最简单一步）与流水" class="headerlink" title="异常判定逻辑（最简单一步）与流水"></a>异常判定逻辑（最简单一步）与流水</h4><hr>
+<h6 id="异常判定逻辑："><a href="#异常判定逻辑：" class="headerlink" title="异常判定逻辑："></a>异常判定逻辑：</h6><p>在 <code>F</code>、<code>D</code>、<code>E</code>、<code>M</code> 级各选择一个顺眼的元件来输出异常码，没有硬性要求，想单设一个小工厂也可以，甚至想在 <code>cpu.v</code> 里直接设置都可以（只要你足够了解自己的实现）。我选择的是 <code>Pc</code>、<code>MainCtrl_D</code>、<code>Alu</code>、<code>Cp0/StoreCtrl/LoadCtrl</code>（课下没有要在 <code>M</code> 级判断的异常，但课上很可能有，要提前想好）。</p>
+<p>我的异常码命名全是 元件名 + <code>excCode</code> </p>
+<ul>
+<li>__<code>F</code> 级：__只存在一种异常：<code>Pc</code> 值非法。非常的简单：</li>
+</ul>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assign</span> Pc_excCode = ((pc[<span class="number">1</span>:<span class="number">0</span>] != <span class="number">2&#x27;b00</span>) || (pc &lt; <span class="number">32&#x27;h3000</span>) || (pc &gt; <span class="number">32&#x27;h6fff</span>)) ? `AdEl : <span class="number">5&#x27;b00</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><code>D</code> 级：</strong> 存在两种异常（两个异常码）：<code>syscall</code> 指令与陌生指令。宏定义这里就不做解释了。</li>
+</ul>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assign</span> MainCtrl_excCode = (<span class="keyword">type</span> == `SYSCALL) ? `Syscall :</span><br><span class="line">                          (<span class="keyword">type</span> == `UNKNOWN) ? `RI :</span><br><span class="line">                          <span class="number">5&#x27;b00</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>__<code>E</code> 级：__三个异常码十种异常：</p>
+<ul>
+<li><p>先添加一些辅助线：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> load  = (<span class="keyword">type</span> == `LW) || (<span class="keyword">type</span> == `LH) || (<span class="keyword">type</span> == `LB);</span><br><span class="line"><span class="keyword">wire</span> store = (<span class="keyword">type</span> == `SW) || (<span class="keyword">type</span> == `SH) || (<span class="keyword">type</span> == `SB);</span><br><span class="line"><span class="keyword">wire</span> add_overflow = (aluOp == ADD) &amp;&amp; (inA[<span class="number">31</span>] == inB[<span class="number">31</span>] &amp;&amp; inA[<span class="number">31</span>] != res[<span class="number">31</span>]);</span><br><span class="line"><span class="keyword">wire</span> sub_overflow = (aluOp == SUB) &amp;&amp; (inA[<span class="number">31</span>] != inB[<span class="number">31</span>] &amp;&amp; inA[<span class="number">31</span>] != res[<span class="number">31</span>]);</span><br><span class="line"><span class="keyword">wire</span> overflow = add_overflow || sub_overflow;</span><br></pre></td></tr></table></figure>
+
+<p>判断计算溢出的方式看个人爱好，我喜欢简单一点的🎃，通常（如指令集）采用加宽一位判断 <code>res[32] != res[31]</code> 的办法</p>
+</li>
+<li><p>先上最简单的，<strong>计算溢出异常</strong>，涉事指令只有 <code>add, addi, sub</code></p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> Ov_Exception = overflow &amp;&amp; (<span class="keyword">type</span> == `ADD || <span class="keyword">type</span> == `ADDI || <span class="keyword">type</span> == `SUB);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我这里是参考 <code>Kamonto</code> 学长的博客直接把所有指令的种类 <code>type</code> 给从头到尾流水了，用起很方便【感恩】。如果不想这么做，需要在 <code>MainCtrl</code> 输出一个 <code>mayOverFlow</code> 表示指令类型为 <code>add || addi || sub</code> 并（集中式译码的话）流水到 <code>E</code> 级</p>
+</blockquote>
+<ul>
+<li><p>剩下两个都是硬骨头了，先加个地址异常的辅助线（<del>好自由的地址！^_^</del>）🪁</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> addrFlyingAway = (res &lt; <span class="number">32&#x27;h0000_7F00</span> || res &gt; <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; <span class="comment">// 不在 Timer0 范围内</span></span><br><span class="line">					  (res &lt; <span class="number">32&#x27;h0000_7F10</span> || res &gt; <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; <span class="comment">// 不在 Timer1 范围内</span></span><br><span class="line">					  (res &lt; <span class="number">32&#x27;h0000_0000</span> || res &gt; <span class="number">32&#x27;h0000_2FFF</span>) &amp;&amp; <span class="comment">// 不在 Im、DM 范围内</span></span><br><span class="line">					  (res &lt; <span class="number">32&#x27;h0000_7F20</span> || res &gt; <span class="number">32&#x27;h0000_7F23</span>);   <span class="comment">// 不在 中断发生器 范围内</span></span><br></pre></td></tr></table></figure>
+
+<p>地址别写错了…… 可以直接复制我的地址&#x2F;和我的地址对一对</p>
+<ul>
+<li><code>Lw</code> <code>LH</code> 地址没对齐</li>
+<li><code>LH</code> <code>LB</code> 读&#x2F;写计时器（只有 <code>LW</code> 允许读&#x2F;写计时器，因为人家是按字存储的）</li>
+<li>地址计算溢出（溢出后的得数单独看很可能合法的，所以这个不能并入下一条）</li>
+<li>访问非法地址（即上面那个 <code>addrFlyingAway</code>）</li>
+</ul>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> AdEl_Exception = (res[<span class="number">1</span>:<span class="number">0</span>] != <span class="number">2&#x27;b00</span>)                            &amp;&amp; (<span class="keyword">type</span> == `LW) ||</span><br><span class="line">                      (res[<span class="number">0</span>] != <span class="number">1&#x27;b0</span>)                               &amp;&amp; (<span class="keyword">type</span> == `LH) ||  </span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F00</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; (<span class="keyword">type</span> == `LH) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F10</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; (<span class="keyword">type</span> == `LH) ||</span><br><span class="line">					  (res &gt;= <span class="number">32&#x27;h0000_7F00</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; (<span class="keyword">type</span> == `LB) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F10</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; (<span class="keyword">type</span> == `LB) ||</span><br><span class="line">                      add_overflow                                   &amp;&amp; load ||  </span><br><span class="line">                      addrFlyingAway                                 &amp;&amp; load;  </span><br></pre></td></tr></table></figure>
+
+<p><code>AdEs</code> 比 <code>AdEl</code> 多一个不能写 <code>Timer</code> 的 <code>counter</code> 的要求</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> AdEs_Exception = (res[<span class="number">1</span>:<span class="number">0</span>] != <span class="number">2&#x27;b00</span>)                            &amp;&amp; (<span class="keyword">type</span> == `SW) ||</span><br><span class="line">                      (res[<span class="number">0</span>] != <span class="number">1&#x27;b0</span>)                               &amp;&amp; (<span class="keyword">type</span> == `SH) ||  </span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F00</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; (<span class="keyword">type</span> == `SH) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F10</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; (<span class="keyword">type</span> == `SH) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F00</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; (<span class="keyword">type</span> == `SB) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F10</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; (<span class="keyword">type</span> == `SB) ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F08</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F0B</span>) &amp;&amp; store ||</span><br><span class="line">                      (res &gt;= <span class="number">32&#x27;h0000_7F18</span> &amp;&amp; res &lt;= <span class="number">32&#x27;h0000_7F1B</span>) &amp;&amp; store ||</span><br><span class="line">                      add_overflow                                   &amp;&amp; store ||</span><br><span class="line">                      addrFlyingAway                                 &amp;&amp; load;  </span><br></pre></td></tr></table></figure>
+
+<p>还是，千万别写错了，这玩意儿写错了真没法 <code>de</code>，甚至课下都不一定能测的出来。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>​		最后合一下，这些异常不会同时发生，没有优先级的顾虑：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assign</span> Alu_excCode = Ov_Exception ? `Ov :</span><br><span class="line">                     AdEl_Exception ? `AdEl :</span><br><span class="line">                     AdEs_Exception ? `AdEs :</span><br><span class="line">                     <span class="number">5&#x27;b00</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="流水-excCode："><a href="#流水-excCode：" class="headerlink" title="流水 excCode："></a>流水 <code>excCode</code>：</h6><p>当前不存在同一条指令触发的不同异常优先级不同的情况，所有异常均遵循先触发的优先级更高的原则，即：同一指令，在靠前的流水级触发的异常优先级更高；不同指令，靠前的指令（先执行的指令）触发的异常优先级更高。基本上是这个形式：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">excCode_X = (excCode_[X - <span class="number">1</span>]) ? excCode_[X - <span class="number">1</span>] : [X 级元件]_excCode;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="内部异常的容忍"><a href="#内部异常的容忍" class="headerlink" title="内部异常的容忍"></a>内部异常的容忍</h4><hr>
+<p>在 <strong>thysrael</strong> 学长的博客里看到这个叫法，感觉非常有感觉。</p>
+<p>其实就是两件事，所有<code>F</code> 、<code>D</code> 级发现的受害指令经过 <code>D_E</code> 变空泡，所有异常指令经过 <code>M_W</code> 变空泡（这个后面提怎么实现）。</p>
+<p>不骗你，就这两件事没别的了。以及，这是个人认为最好（简洁 + 安全）的实现方式。</p>
+<p>当然有很多很多实现方法，比如只禁掉写使能不变空泡，但哪儿有直接清空来得方便？（无论是哪种译码方式）</p>
+<p>__为什么不一旦检测到异常就变空泡呢？__危险，这是因为同一条指令可能在不同流水级触发优先级不同的异常，万一后面的流水级涉及到更高级别的异常呢？结果人家等了半天就见一个空泡摇摇晃晃地浮上来，销毁所有犯罪证据 v_v，一看就是有问题。（暂时没有，保不齐课上加）</p>
+<p><strong>为什么经过 <code>M_W</code></strong> 要变空泡呢？首先 <code>W</code>  级不可能加异常，所以我们可以安心的放一个空泡过去。<code>W</code> 级在 <code>Cp0</code> 之后（不管你 <code>Cp0</code> 在哪个流水级都是这样），<code>Cp0</code> 是去解决异常了，但它不解决异常指令啊，如果不管的话，还是会放一个已经 “记录在案” 的受害指令过去大闹 <code>W</code> 级（乱写 <code>Grf</code>）。</p>
+<p><strong>怎么实现？</strong> 前一个在 <code>D_E</code> 里加 <code>excCode != 0</code> 则 <code>inStr_ &lt;= 0</code> 即可，后一个跟所有其他流水线寄存器一样 <code>Req</code> 清零就行，但要知道这和其它流水线寄存器清零的原理并不一样）。 </p>
+<h4 id="流水寄存器和元件在-Req-时的行为"><a href="#流水寄存器和元件在-Req-时的行为" class="headerlink" title="流水寄存器和元件在 Req 时的行为"></a>流水寄存器和元件在 <code>Req</code> 时的行为</h4><hr>
+<p>这里插播一条（其实放这里不合适，但便于理解）</p>
+<p>上文提到，出于不同原因，所有流水线寄存器遇到 <code>Req</code> 都要清空，原因有两种：</p>
+<ul>
+<li><p>对于 <code>M_W</code>： 是为了防止已经 “记录在案” 的受害指令过去大闹 <code>W</code> 级（乱写 <code>Grf</code>）。</p>
+</li>
+<li><p>对于其它流水线寄存器： 是为了清空流水线，好让异常处理指令进来。以及保证 “受害指令及其后面的指令像没发生过一样”</p>
+</li>
+</ul>
+<h5 id="怎么实现清空流水线寄存器？"><a href="#怎么实现清空流水线寄存器？" class="headerlink" title="怎么实现清空流水线寄存器？"></a>怎么实现清空流水线寄存器？</h5><p>流水线寄存器里现在有一大堆控制信号了：<code>reset, Req, stall, flush</code>（最后一个是方便 P6 课上加指令清空延迟槽的），它们的优先级是怎样的？<code>Reset</code> 是要关机重启了，它最大。<code>Req</code> 是要给异常处理程序腾地方了，都清空了还阻塞什么？所以它次之。剩下两个 <code>stall &gt; flush</code> 大家已经知道了（不然能过 P5 只能说很幸运），所以：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reset &gt; Req &gt; stall &gt; flush</span><br></pre></td></tr></table></figure>
+
+<p>另外，如果你已经做了思考题，你会发现有一道题目（我们这届的）叫做 <strong>在清空流水线寄存器的时候需要保留什么？</strong></p>
+<blockquote>
+<p>5、倘若中断信号流入的时候，在检测宏观 PC 的一级如果是一条空泡（你的 CPU 该级所有信息均为空）指令，此时会发生什么问题？在此例基础上请思考：在 P7 中，清空流水线产生的空泡指令应该保留原指令的哪些信息？</p>
+</blockquote>
+<p>按照我 <code>P6</code> 的实现，宏观 <code>Pc</code> 会冷不丁变成 0x3000 一小会儿   ……<small>无关言论</small>……   替换的空泡指令应继承原指令的 <code>Pc</code>，插入的空泡指令应流水下一条指令相同的 <code>Pc</code>，插入在被阻塞的延迟槽指令前的空泡应继承该延迟槽指令的 <code>BE</code></p>
+<p>具体实现为空泡前流水线寄存器中的 <code>BE</code> 和 <code>Pc</code> 都正常流水</p>
+<h5 id="元件在-Req-时的行为："><a href="#元件在-Req-时的行为：" class="headerlink" title="元件在 Req 时的行为："></a>元件在 <code>Req</code> 时的行为：</h5><ul>
+<li><p>禁止写内存</p>
+<p>这个好实现，但请务必选择一个可扩展性好的方式，便于课上加指令，比如：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assign</span> memWrEn = &#123;</span><br><span class="line">    (! Req) &amp;&amp; &#123;……&#125;,</span><br><span class="line">    (! Req) &amp;&amp; &#123;……&#125;,</span><br><span class="line">    (! Req) &amp;&amp; &#123;……&#125;,</span><br><span class="line">    (! Req) &amp;&amp; &#123;……&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>封闭乘除槽</p>
+<p>必须禁止进入，至于原本就在乘除槽里的，在 <code>Req</code> 那一个周期，停掉也可以，继续算也可以，不差那点效率</p>
+<p><strong>注意！</strong> 我一开始投机取巧，觉得先给 <code>HI/LO</code> 赋值，回来再倒计时是一样的，但 <code>WA</code> 了，因为异常处理程序里也有读写 <code>HI/LO</code></p>
+</li>
+</ul>
+<h4 id="Cp0"><a href="#Cp0" class="headerlink" title="Cp0"></a>Cp0</h4><hr>
+<p><code>Cp0</code> 里有很多寄存器，我们只要求实现了一部分功能，所以只设置需要的那部分就可以（目前就只有三个）。</p>
+<p>如下图，即使是这三个需要的寄存器，也只是需要其中的部分位，其余无关位初始化为 0，然后 除非 <code>ntc0</code> 写它们否则不去动它们就好。</p>
+<p>虽然理论上说无关位恒为 0 禁止写入甚至干脆不实现都可以，但我没试过，不知道能不能通过评测。</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/nuxb6sf9.png" style="zoom:40%;" />
+
+
+
+<h4 id="陷入内核"><a href="#陷入内核" class="headerlink" title="陷入内核"></a>陷入内核</h4><hr>
+<h5 id="保留现场"><a href="#保留现场" class="headerlink" title="保留现场"></a>保留现场</h5><ul>
+<li><p><code>Epc</code></p>
+<p>异常处理程序不是我们该关心的，我们默认异常处理程序会解决当前问题（即让受害指令不再产生异常、可以正常执行），所以需要保证跳回到当前指令重新执行当前指令。</p>
+<p>但实际上，异常处理程序有可能无法解决（或者懒得解决）当前问题，这时它解决问题的方式就变成了把我们传给他的 EPC 加上4（跳过异常指令）。</p>
+<p>但跳过异常指令属于 ”解决异常的一部分“，这不是我们该关心的，所以我们必须默认 EPC 可以重新执行受害指令。</p>
+<p><strong>综上所述</strong>，<code>Epc</code> 就是 <code>Cp0</code> 级 <code>Pc</code>。</p>
+</li>
+<li><p><code>excCode</code></p>
+</li>
+</ul>
+<h5 id="跳转到异常处理程序"><a href="#跳转到异常处理程序" class="headerlink" title="跳转到异常处理程序"></a>跳转到异常处理程序</h5><p>这里的跳转和我们过去实现的跳转不同。</p>
+<p>首先它没有延迟槽一说，因为 </p>
+<blockquote>
+<p>受害指令及其后的指令像没发生过一样</p>
+</blockquote>
+<p>被人道主义消灭了。</p>
+<p>其次是 <code>Req</code> 在 <code>M</code> 级的时候跳转，那它肯定不能加入 <code>D</code> 级的跳转大军了。</p>
+<p>所以只需要在 <code>Req</code> 为 1 时将 <code>Npc</code> 的输出设为 <code>0x4180</code> 即可（这里不需要管 <code>Pc</code>，至少和我一样 <code>Npc</code> 是纯组合逻辑的话不用管）。</p>
+<blockquote>
+<p>另外所有流水寄存器（除了 <code>M_W</code> 无所谓）的 <code>pc</code> 都要同时同步成 <code>0x4180</code> 喔，不然会出现宏观 <code>Pc</code> 在 <code>Req</code> 之后又溜出去一段的诡异情景。</p>
+</blockquote>
+<h5 id="跳回来"><a href="#跳回来" class="headerlink" title="跳回来"></a>跳回来</h5><p>指导书里强调了</p>
+<blockquote>
+<p><code>eret</code> 没有延迟槽，你需要确保 <code>eret</code> 的下一条指令不被执行。</p>
+</blockquote>
+<p>这里至少有两种实现方式，<strong>注意</strong> 虽然这两种方式都可以通过评测，但在对拍时会因为周期数不同而出现报错（至少伟大的 <code>COT</code> 是这样），可以把两种都实现为了对拍🐸。</p>
+<p><strong>第一种，清空延迟槽</strong>。这是比较正统的思路，可以合并进过去的跳转逻辑的。如果不考虑延迟槽，这个 <code>eret</code> 和 <code>jr</code> 太像了，唯一的区别就是目的地寄存器是从 <code>Cp0</code> 直连过来的 <code>Epc</code>，所以像 <code>jr</code> 一样实现就可以了。然后要清空延迟槽，相信已经通过 p5P6 的各位对此已经很熟悉了。</p>
+<p><strong>第二种，偷周期（偷了整整一个周期）。</strong> 这属于邪修了，既然当 <code>D</code> 级是 <code>eret</code> 时，<code>F</code> 级的延迟槽指令我们不要了，那把它偷偷换成 <code>Epc</code> 指令不就行了？只需要在 <code>D</code> 级译码出来 <code>eret</code> 的时候，悄悄把 <code>Pc</code> （模块）传出来的 <code>Pc</code> 值换成 <code>Epc</code> 就好了，反正原本的 <code>F</code> 级指令已经被抛弃了。这样偷天换日，都不用改 <code>Pc</code> 和 <code>Npc</code>。在下个周期 <code>Npc</code> 会根据我们偷换的 <code>Pc</code> 计算 <code>Pc + 4</code>，实现了无缝衔接。</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/xjdg3wdu.png" style="zoom:33%;" />
+
+<h4 id="加指令和数据冲突和阻塞和转发"><a href="#加指令和数据冲突和阻塞和转发" class="headerlink" title="加指令和数据冲突和阻塞和转发"></a>加指令和数据冲突和阻塞和转发</h4><hr>
+<p>加指令的基础操作略，直接看阻塞&#x2F;转发。唯一的数据冲突就是 <code>mtc0</code> 在 <code>M</code> 级写 <code>Epc</code> 的时候，或者 <code>mtc0</code> 在 <code>E</code> 级的时候，<code>D</code> 级出现了 <code>eret</code>。</p>
+<h6 id="全速转发"><a href="#全速转发" class="headerlink" title="全速转发"></a>全速转发</h6><p>为了速度，悲痛欲绝地决定增加转发通路：</p>
+<h6 id="全阻塞"><a href="#全阻塞" class="headerlink" title="全阻塞"></a>全阻塞</h6><p>事实证明是能过的。</p>
+<h6 id="M-D-转发，E-D-阻塞"><a href="#M-D-转发，E-D-阻塞" class="headerlink" title="M-D 转发，E-D 阻塞"></a><code>M-D</code> 转发，<code>E-D</code> 阻塞</h6><p>这是我选择的，折中的实现方式。读和写的都是 <code>Epc</code>，在 <code>Cp0</code> 内部转发就好了，这个比阻塞还好实现：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Cp0.v</span></span><br><span class="line"><span class="keyword">assign</span> EpcOut = (wrEn &amp;&amp; (cp0Addr == <span class="number">5&#x27;b01110</span>)) ? cp0In : EPC;</span><br></pre></td></tr></table></figure>
+
+<p>提前把要写的东西抢到手。</p>
+<h4 id="桥与外设"><a href="#桥与外设" class="headerlink" title="桥与外设"></a>桥与外设</h4><hr>
+<h6 id="桥"><a href="#桥" class="headerlink" title="桥"></a>桥</h6><p>我理解出来的是，要把 <code>Cpu</code> 对外隐藏实现细节，封装成单周期，然后把单周期封装成 <code>mips</code>，对外隐藏内部接线，只通过桥与外界沟通。但这样涉及到一些问题，比如 <code>Timer</code>，它肯定算外设毋庸置疑，但它该不该通过桥与 <code>cpu</code> 相连通？</p>
+<p>指导书的配图是类似这样的：</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/c46tn1om.png" style="zoom:33%;" />
+
+<p><strong>封装了又好像没封装</strong>，基本上只有 <code>tb</code> 是通过桥与 <code>Cpu</code> 相连通的，<code>Timer</code>、中断器什么的都直接连在 <code>Cpu</code> 上了。这样真的能起到系统桥的作用吗❓❔万一我要改 <code>IM</code>，岂不是还要改 <code>Cpu</code> 的接口？</p>
+<p>我最后的实现是这样的：</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/4p16m9ui.png" style="zoom:33%;" />
+
+<p>就是，完全封装了。</p>
+<h6 id="计时器"><a href="#计时器" class="headerlink" title="计时器"></a>计时器</h6><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/2c4pjv98.png" style="zoom:33%;" />
+
+
+
+
+
+
+
+<h2 id="往年题"><a href="#往年题" class="headerlink" title="往年题"></a><center>往年题</center></h2><p>P7 没有推荐题，这让人有点忧伤，特别是在群魔乱舞的 P7，不提交是不太能确认自己的实现是否正确的，但还是可以对一下的👁️。这里整理了我找到的全部往年题和我的实现。</p>
+<h6 id="Tiltiu"><a href="#Tiltiu" class="headerlink" title="Tiltiu"></a>Tiltiu</h6><p>不要被 <code>trap</code> 骗了，我们是不会考得这么简单的 v_v</p>
+<h6 id="Withdraw"><a href="#Withdraw" class="headerlink" title="Withdraw"></a>Withdraw</h6><h6 id="Watch"><a href="#Watch" class="headerlink" title="Watch"></a>Watch</h6><h6 id="Monitor"><a href="#Monitor" class="headerlink" title="Monitor"></a>Monitor</h6></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Dried Mushroom</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/">http://example.com/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CO/">CO</a></div><div class="post-share"><div class="social-share" data-image="https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/01/24/%E9%9B%B6/" title="零"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/5v3wlkje.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">零</div></div><div class="info-2"><div class="info-item-1">你好。再见。 经典台词：“生活就像一盒巧克力，你永远不知道下一颗是什么味道。”  </div></div></div></a><a class="pagination-related" href="/2026/01/23/hello-world/" title="Hello World"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/5v3wlkje.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;  More info: Writing Run server1$ hexo server  More info: Server Generate static files1$ hexo generate  More info: Generating Deploy to remote sites1$ hexo deploy  More info: Deployment </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/owl.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Dried Mushroom</div><div class="author-info-description">你们说有没有可能，色彩鲜艳的蘑菇毒性强是因为它高兴？</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">你好，这里是蘑菇干，但最近有变成新鲜蘑菇的趋势</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BA%A6%E5%AE%9A%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">约定：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E6%8F%90%E4%BE%9B%E4%B8%80%E7%A7%8D%E5%8F%AF%E8%A1%8C%E7%9A%84%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F"><span class="toc-number">2.</span> <span class="toc-text">这里提供一种可行的实现顺序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%88%A4%E5%AE%9A%E9%80%BB%E8%BE%91%EF%BC%88%E6%9C%80%E7%AE%80%E5%8D%95%E4%B8%80%E6%AD%A5%EF%BC%89%E4%B8%8E%E6%B5%81%E6%B0%B4"><span class="toc-number">3.</span> <span class="toc-text">异常判定逻辑（最简单一步）与流水</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E5%88%A4%E5%AE%9A%E9%80%BB%E8%BE%91%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">异常判定逻辑：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%B5%81%E6%B0%B4-excCode%EF%BC%9A"><span class="toc-number">3.2.</span> <span class="toc-text">流水 excCode：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E5%BC%82%E5%B8%B8%E7%9A%84%E5%AE%B9%E5%BF%8D"><span class="toc-number">4.</span> <span class="toc-text">内部异常的容忍</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%81%E6%B0%B4%E5%AF%84%E5%AD%98%E5%99%A8%E5%92%8C%E5%85%83%E4%BB%B6%E5%9C%A8-Req-%E6%97%B6%E7%9A%84%E8%A1%8C%E4%B8%BA"><span class="toc-number">5.</span> <span class="toc-text">流水寄存器和元件在 Req 时的行为</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E6%B8%85%E7%A9%BA%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%9F"><span class="toc-number">5.1.</span> <span class="toc-text">怎么实现清空流水线寄存器？</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%83%E4%BB%B6%E5%9C%A8-Req-%E6%97%B6%E7%9A%84%E8%A1%8C%E4%B8%BA%EF%BC%9A"><span class="toc-number">5.2.</span> <span class="toc-text">元件在 Req 时的行为：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Cp0"><span class="toc-number">6.</span> <span class="toc-text">Cp0</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%99%B7%E5%85%A5%E5%86%85%E6%A0%B8"><span class="toc-number">7.</span> <span class="toc-text">陷入内核</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%9D%E7%95%99%E7%8E%B0%E5%9C%BA"><span class="toc-number">7.1.</span> <span class="toc-text">保留现场</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B7%B3%E8%BD%AC%E5%88%B0%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F"><span class="toc-number">7.2.</span> <span class="toc-text">跳转到异常处理程序</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B7%B3%E5%9B%9E%E6%9D%A5"><span class="toc-number">7.3.</span> <span class="toc-text">跳回来</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A0%E6%8C%87%E4%BB%A4%E5%92%8C%E6%95%B0%E6%8D%AE%E5%86%B2%E7%AA%81%E5%92%8C%E9%98%BB%E5%A1%9E%E5%92%8C%E8%BD%AC%E5%8F%91"><span class="toc-number">8.</span> <span class="toc-text">加指令和数据冲突和阻塞和转发</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%85%A8%E9%80%9F%E8%BD%AC%E5%8F%91"><span class="toc-number">8.1.</span> <span class="toc-text">全速转发</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%85%A8%E9%98%BB%E5%A1%9E"><span class="toc-number">8.2.</span> <span class="toc-text">全阻塞</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#M-D-%E8%BD%AC%E5%8F%91%EF%BC%8CE-D-%E9%98%BB%E5%A1%9E"><span class="toc-number">8.3.</span> <span class="toc-text">M-D 转发，E-D 阻塞</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A1%A5%E4%B8%8E%E5%A4%96%E8%AE%BE"><span class="toc-number">9.</span> <span class="toc-text">桥与外设</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%A1%A5"><span class="toc-number">9.1.</span> <span class="toc-text">桥</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%AE%A1%E6%97%B6%E5%99%A8"><span class="toc-number">9.2.</span> <span class="toc-text">计时器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%80%E5%B9%B4%E9%A2%98"><span class="toc-number">10.</span> <span class="toc-text">往年题</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#Tiltiu"><span class="toc-number">10.1.</span> <span class="toc-text">Tiltiu</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Withdraw"><span class="toc-number">10.2.</span> <span class="toc-text">Withdraw</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Watch"><span class="toc-number">10.3.</span> <span class="toc-text">Watch</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Monitor"><span class="toc-number">10.4.</span> <span class="toc-text">Monitor</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/01/24/%E9%9B%B6/" title="零"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/5v3wlkje.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="零"/></a><div class="content"><a class="title" href="/2026/01/24/%E9%9B%B6/" title="零">零</a><time datetime="2026-01-23T16:57:06.000Z" title="Created 2026-01-24 00:57:06">2026-01-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/" title="从流水线到微系统"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="从流水线到微系统"/></a><div class="content"><a class="title" href="/2026/01/23/%E4%BB%8E%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%88%B0%E5%BE%AE%E7%B3%BB%E7%BB%9F/" title="从流水线到微系统">从流水线到微系统</a><time datetime="2026-01-23T15:00:00.000Z" title="Created 2026-01-23 23:00:00">2026-01-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.luogu.com.cn/upload/image_hosting/5v3wlkje.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:47.885Z" title="Created 2026-01-23 00:55:47">2026-01-23</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(https://cdn.luogu.com.cn/upload/image_hosting/ddrjusez.png);"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Dried Mushroom</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>
