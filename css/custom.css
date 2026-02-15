@@ -1,0 +1,75 @@
+body {
+  background: rgb(185, 181, 181) !important;
+}
+
+/* 默认卡片过渡 */
+#recent-posts .recent-post-item {
+  background: rgba(213, 232, 244, 0.4) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+
+/* Tech 分类 */
+#recent-posts .recent-post-item:has(a[href*="/categories/数学建模/"]) {
+  background: #b4dcffcc;
+}
+
+/* Life 分类 */
+#recent-posts .recent-post-item:has(a[href*="/categories/Life/"]) {
+  background: rgba(200, 255, 200, 0.8);
+}
+
+/* Study 分类 */
+#recent-posts .recent-post-item:has(a[href*="/categories/Study/"]) {
+  background: rgba(230, 200, 255, 0.8);
+}
+
+
+/* 侧边栏卡片 */
+.aside-content .card-widget {
+  background: rgba(213, 232, 244, 0.4) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+/* 侧边栏卡片 */
+.aside-content .card-widget.card-info {
+  background: rgba(151, 210, 246, 0.4) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+
+/* 正文页面 */
+#post {
+  background: rgba(248, 249, 250, 0.6) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+
+[data-theme="dark"] #post {
+  background: rgba(20, 20, 20, 0.5) !important; /* 黑 + 透明 */
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+
+/* 归档、分类、标签页 */
+#archive,
+#category,
+#tag {
+  background: rgba(216, 245, 206, 0.8) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+}
+
+#footer {
+  background: url("/img/footer-bg.jpg") center/cover no-repeat !important;
+}
+
+[data-theme="dark"] #footer {
+  background: url("/img/footer-bg-dark.jpg") center/cover no-repeat !important;
+}
+
