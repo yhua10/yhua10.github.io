@@ -59,11 +59,15 @@ body {
 /* 归档、分类、标签页 */
 #archive,
 #category,
-#tag {
+#tag,
+.page-archives,
+.page-categories,
+.page-tags {
   background: rgba(216, 245, 206, 0.8) !important;
   backdrop-filter: blur(6px);
   border-radius: 15px;
 }
+
 
 #footer {
   background: url("/img/footer-bg.jpg") center/cover no-repeat !important;
