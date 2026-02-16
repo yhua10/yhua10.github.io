@@ -56,17 +56,26 @@ body {
   transition: 0.3s ease;
 }
 
-/* 归档、分类、标签页 */
-#archive,
-#category,
-#tag,
-.page-archives,
-.page-categories,
-.page-tags {
-  background: rgba(216, 245, 206, 0.8) !important;
+/* 归档 / 分类 / 标签 页面背景 */
+#page {
+  background: rgba(222, 242, 215, 0.7) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: 0.3s ease;
+}
+[data-theme="dark"] #page {
+  background: rgba(60, 100, 60, 0.5) !important;
+}
+#archive {
+  background: rgba(222, 242, 215, 0.7) !important;
   backdrop-filter: blur(6px);
   border-radius: 15px;
 }
+[data-theme="dark"] #archive {
+  background: rgba(60, 100, 60, 0.5) !important;
+}
+
+
 
 
 #footer {
