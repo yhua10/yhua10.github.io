@@ -57,23 +57,25 @@ body {
 }
 
 /* 归档 / 分类 / 标签 页面背景 */
+
 #page {
-  background: rgba(222, 242, 215, 0.7) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
   backdrop-filter: blur(6px);
   border-radius: 15px;
   transition: 0.3s ease;
 }
 [data-theme="dark"] #page {
-  background: rgba(60, 100, 60, 0.5) !important;
+  background: rgba(99, 99, 99, 0.5) !important;
 }
 #archive {
-  background: rgba(222, 242, 215, 0.7) !important;
+  background: rgba(222, 242, 215, 0.5) !important;
   backdrop-filter: blur(6px);
   border-radius: 15px;
 }
 [data-theme="dark"] #archive {
   background: rgba(60, 100, 60, 0.5) !important;
 }
+
 
 
 
@@ -86,3 +88,74 @@ body {
   background: url("/img/footer-bg-dark.jpg") center/cover no-repeat !important;
 }
 
+
+
+/* 友链整体布局 */
+.friend-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+/* 单个友链卡片 */
+.friend-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  /*background: rgba(205, 244, 237, 0.8);*/
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+/* hover 动效 */
+.friend-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* 头像 */
+.friend-card img {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+/* 文字区域 */
+.friend-info a {
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.friend-info p {
+  margin: 6px 0 0;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+/* 友链卡片背景色 */
+
+.friend-card.card-yhua10 {
+  background: rgb(241, 231, 189);
+}
+[data-theme="dark"] .card-yhua10 {
+  background: rgba(146, 144, 116, 0.5);
+}
+
+.friend-card.card-ana {
+  background: rgb(255, 255, 255);
+}
+[data-theme="dark"] .card-ana {
+  background: rgba(154, 154, 154, 0.5);
+}
+
+.friend-card.card-shark {
+  background: rgb(192, 241, 254);
+}
+[data-theme="dark"] .card-shark {
+  background: rgba(122, 151, 159, 0.5);;
+}
