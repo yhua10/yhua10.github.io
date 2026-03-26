@@ -159,3 +159,14 @@ body {
 [data-theme="dark"] .card-shark {
   background: rgba(122, 151, 159, 0.5);;
 }
+
+
+/* 白天模式头像 */
+[data-theme="light"] #aside-content .card-info .avatar-img img {
+  content: url('/img/morningowl.png') !important;
+}
+
+/* 夜晚模式头像 */
+[data-theme="dark"] #aside-content .card-info .avatar-img img {
+  content: url('/img/nightowl.png') !important;
+}
