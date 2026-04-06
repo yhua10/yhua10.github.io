@@ -1,0 +1,379 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OS理论 | yhua10's Blog</title><meta name="author" content="yhua10"><meta name="copyright" content="yhua10"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="内存管理  计算机从内存向缓存传输数据的单位是：Cache Line 地址空间：程序使用的逻辑地址的集合 存储空间：存储信息的物理地址的集合 程序在内存中运行，以内存为中心存储资源。从用户角度，希望容量大、速度快、独立无干扰；从资源管理角度，希望同时为多用户提供服务，兼顾效率、利用率、能耗。这是内存管理的目标，也是操作系统管理内存的依据。  地址独立：logical 地址与 physical 地址">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OS理论">
+<meta property="og:url" content="https://yhua10.github.io/OS%E7%90%86%E8%AE%BA.html">
+<meta property="og:site_name" content="yhua10&#39;s Blog">
+<meta property="og:description" content="内存管理  计算机从内存向缓存传输数据的单位是：Cache Line 地址空间：程序使用的逻辑地址的集合 存储空间：存储信息的物理地址的集合 程序在内存中运行，以内存为中心存储资源。从用户角度，希望容量大、速度快、独立无干扰；从资源管理角度，希望同时为多用户提供服务，兼顾效率、利用率、能耗。这是内存管理的目标，也是操作系统管理内存的依据。  地址独立：logical 地址与 physical 地址">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yhua10.github.io/img/neww.jpg">
+<meta property="article:published_time" content="2026-04-06T02:19:44.677Z">
+<meta property="article:modified_time" content="2026-03-30T13:03:48.420Z">
+<meta property="article:author" content="yhua10">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yhua10.github.io/img/neww.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/neww.jpg"><link rel="canonical" href="https://yhua10.github.io/OS%E7%90%86%E8%AE%BA.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OS理论',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="<%- url_for('/css/custom.css') %>"<meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="bg-animation" id="web_bg" style="background-image: url(https://i.postimg.cc/X7FR4nVj/wei-xin-tu-pian-20260207083752-42-69.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.postimg.cc/fb02jKk1/owl.jpg" alt="Logo"><span class="site-name">yhua10's Blog</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">OS理论</h1></header><main class="layout" id="content-inner"><div id="page"><div class="page-title">OS理论</div><div class="container" id="article-container"><h2 id="内存管理">内存管理</h2>
+<hr>
+<p>计算机从内存向缓存传输数据的单位是：Cache Line</p>
+<p>地址空间：程序使用的逻辑地址的集合</p>
+<p>存储空间：存储信息的物理地址的集合</p>
+<p>程序在内存中运行，以内存为中心存储资源。<strong>从用户角度</strong>，希望容量大、速度快、独立无干扰；<strong>从资源管理角度</strong>，希望同时为多用户提供服务，兼顾效率、利用率、能耗。这是内存管理的目标，也是操作系统管理内存的依据。</p>
+<ul>
+<li>地址独立：<code>logical</code> 地址与 <code>physical</code> 地址无关</li>
+<li>地址保护：一个程序不能访问另一个程序的地址空间</li>
+</ul>
+<h3 id="单道程序的内存管理">单道程序的内存管理</h3>
+<p>加载器实现静态地址翻译（程序运行之前确定所有物理地址），显然地址独立、地址保护</p>
+<h3 id="多道程序的内存管理">多道程序的内存管理</h3>
+<p>内碎片：指分配给作业的存储空间中未被利用的部分</p>
+<p>外碎片：指系统中无法利用的小的空闲分区</p>
+<p>跟踪内存：</p>
+<ul>
+<li>位图表示法（分区表），每个分配单元赋予一个字位，记录该分配单元是否闲置。
+<ul>
+<li>优点：空间成本固定（要么闲置、要么不闲置，闲置与不闲置从占用内存角度一视同仁），时间成本低。</li>
+<li>缺点：没有容错能力：无法判断一个分配单元为 1 是真的为 1 还是因为错误变成 1。</li>
+</ul>
+</li>
+<li>链表表示法（分区链表），将空闲单元用链表连接起来，每个链表项记录是否闲置与始末地址。
+<ul>
+<li>优点：有一定容错能力：可相互验证。</li>
+<li>空间成本取决于程序的数量，时间成本高。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>这俩数据结构自己存在内核里。</p>
+</blockquote>
+<h4 id="固定式分区">固定式分区</h4>
+<p>程序适应分区，把内存划分为若干个固定大小的连续分区。</p>
+<ul>
+<li>DS：分区表（记录分区的大小和使用情况）。</li>
+<li>分配方式：单队列/多队列。</li>
+<li>优点：易于实现，开销小。</li>
+<li>缺点：内碎片造成浪费，分区总数固定，限制了并发执行的程序数目。</li>
+</ul>
+<h4 id="可变式分区">可变式分区</h4>
+<p>分区适应程序，分区的边界可以移动，即分区的大小可变</p>
+<ul>
+<li>DS：分区链表</li>
+<li>无内碎片，有外碎片</li>
+</ul>
+<blockquote>
+<p>分配操作：<code>size</code>：不可再分；<code>m.size</code>：剩余；<code>u.size</code>：需要</p>
+<ul>
+<li><code>m.size - u.size &lt;= size</code>：将整个分区分配给请求者</li>
+<li>否则，划一块儿出去</li>
+</ul>
+</blockquote>
+<h4 id="分配算法">分配算法</h4>
+<h5 id="基于顺序搜索：小型系统">基于顺序搜索：小型系统</h5>
+<ul>
+<li>首次适应算法（First Fit）：从空白区域链的 <strong>始端</strong> 开始查找，选择第一个足以满足请求的空白块。——低地址留下很多难以利用的小的空闲分区</li>
+<li>下次适应算法（Next Fit）：从上次查找结束的地方开始，只要找到一个足够大的空白区。——缺乏大的空闲分区</li>
+<li>最佳适应算法（Best Fit）：寻找大小最接近于作业所要求的存储区域——剩下的空闲区太小</li>
+<li>最坏适应算法（Worst Fit）：总是寻找最大的空白区——需要大空间的作业得不到满足</li>
+</ul>
+<h5 id="基于索引搜索：中大型系统">基于索引搜索：中大型系统</h5>
+<ul>
+<li>快速适应算法：把空闲分区按容量大小进行分类，经常用到长度的空闲区设立单独的空闲区链表。系统为多个空闲链表设立一张管理索引表。——查找效率高，不会对任何分区分割；算法复杂，系统开销大</li>
+<li>伙伴系统：在分配存储块时将一个大的存储块分裂成两个大小相等的小块，这两个小块就称为“伙伴” 。大小均为 2 的幂次。分配和释放均递归。释放内存时找自己的伙伴合并。</li>
+</ul>
+<p>紧凑技术 <code>&lt;—</code> 动态重定位</p>
+<h3 id="程序的存储分配">程序的存储分配</h3>
+<h4 id="存储分配方式">存储分配方式</h4>
+<ul>
+<li>直接指定方式
+<ul>
+<li>编程/汇编 时，所用的是实际地址</li>
+</ul>
+</li>
+<li>静态分配
+<ul>
+<li>程序员编程时,或由编译程序产生的目的程序,均可从其地址空间的零地址开始；当装配程序对其进行链接装入时才确定它们在主存中的地址。</li>
+</ul>
+</li>
+<li>动态分配
+<ul>
+<li>作业在存储空间中的位置，在其装入时确定，在其执行过程中可根据需要申请附加的存储空间。并且一个作业已占用的部分区域不再需要时，可以要求还给系统。</li>
+</ul>
+</li>
+</ul>
+<h4 id="由源码到可执行">由源码到可执行</h4>
+<ol>
+<li>编译：用户源程序 <code>-&gt;</code> 若干个目标模块</li>
+<li>链接：目标模块 + 库函数 <code>-&gt;</code> 可装载模块（通常是单一可执行文件）
+<ul>
+<li>静态链接：用户一个工程中所需的多个程序采用静态链接的方式链接在一起。当我们希望共享库的函数代码直接链接入程序代码中，也采用静态链接方式</li>
+<li>动态链接：用于链接共享库代码。当程序运行中需要某些目标模块时，才对它们进行链接，具有高效且节省内存空间的优点。但相比静态链接，使用动态链接库的程序相对慢。</li>
+</ul>
+</li>
+<li>装入：可装载模块 <code>-&gt;</code> 装入内存
+<ul>
+<li>一般采用动态运行时装入方式</li>
+</ul>
+</li>
+</ol>
+<p>为了保证程序在内存中的位置可以改变。装入程序把装入模块装入内存后，并不立即把装入模块中相对地址转换为绝对地址，而是在程序运行时才进行。</p>
+<h3 id="页式存储">页式存储</h3>
+<blockquote>
+<p>页表的存在，调整操作系统分配内存的颗粒度。</p>
+</blockquote>
+<blockquote>
+<p>每一个进程有自己的页表，切进程 =&gt; 切页表。</p>
+</blockquote>
+<blockquote>
+<p>MMU 只认识现实；CPU 只认识地图。</p>
+<p>—— 原神</p>
+</blockquote>
+<p>页（Page）：在分页内存管理系统中，把每个作业的地址空间分成一些大小相等的片。</p>
+<p>页框（Frame）：在分页内存管理系统中，把主存的存储空间也分成与页面相同大小的片。</p>
+<p>页表：为了便于在内存找到进程的每个页面所对应块，分页系统中为每个进程配置一张页表，进程逻辑地址空间中的每一页，在页表中都对应有一个页表项。</p>
+<h4 id="机制">机制</h4>
+<p>以32位逻辑地址、二级页表、每级页表大小4KB为例：</p>
+<p>![solor-wind的图片 -）二级页表](D:\buaa_study\second_year_2\OS\notes\solor-wind的图片 -）二级页表.png)</p>
+<p>对于一个进程而言，一级页表通常有一张，而二级页表可以有多张。对于二级页表而言，第一级页表又称页目录，第二级页表又称页表。</p>
+<p>设虚拟地址为 <code>va</code>，一级页表基地址为 <code>pgDir</code>。则页内偏移量为 <code>va[11:0]</code>，一级页表偏移量为 <code>va[31:22]</code>，可在 <code>pgBase + va[31:22]</code> 找到对应的一级页表表项，该表项的内容即为对应二级页表的基地址，加上二级页表偏移量 <code>va[21:12]</code>，可在 <code>*(pgDir + va[31:22]) + va[21:12]</code> 找到对应二级页表表项，该表项的内容即为物理页地址。<code>{*(*(pgDir + va[31:22]) + va[21:12]), va[11:0]}</code> 即为 <code>va</code> 对应的物理地址。</p>
+<ul>
+<li>使得逻辑地址可以大于物理地址大小</li>
+<li>多级页表可解决一级页表占用存储空间较大的问题</li>
+<li>MMU 可解决内存访问效率下降的问题（不分页访存1次，二级页表访存3次）</li>
+</ul>
+<h4 id="页目录自映射">页目录自映射</h4>
+<p>自映射的核心是地址本身也是需要访问的数据，所以一个页目录，它也可以是页表，也可以是页。</p>
+<p>仍然以32位逻辑地址、二级页表、每级页表大小4KB为例：</p>
+<p>32位逻辑地址 <code>-&gt;</code> 220个页表 <code>-&gt;</code> 每个页表项4字节 <code>-&gt;</code> 4MB <code>-&gt;</code> 210个一级页表 <code>-&gt;</code> 4KB</p>
+<p>其中，一级页表称页目录，所有页目录项共占用4KB空间，刚好和页表大小一致。因此，可以将页目录项作为特殊的页表，放入二级页表项中。</p>
+<p>设所有页表（二级页表）的基地址为 <code>PTbase</code> ，共2^20个页表项，总共占用4MB空间。其中有一个页表大小（4KB）放的是页目录，它的基地址设为 <code>PDbase</code> ，是页表基地址在整个逻辑地址中的相对位置映射到4MB中的位置，即 <code>PDbase=(PTbase&gt;&gt;22)&lt;&lt;12+PTbase</code> 。右移22，得到页表基地址是逻辑空间中的第几页，左移12，乘以每页的大小。自映射目录表项 <code>PDE=(PDbase&gt;&gt;22)&lt;&lt;12+PDbase</code></p>
+<h4 id="缺页错误处理过程">缺页错误处理过程</h4>
+<p>当进程执行过程中需访问的页面不在物理存储器（内存）中时，会引发发生缺页中断，进行所需页面换入，步骤如下：</p>
+<ol>
+<li>陷入内核态，保存必要的信息（OS及用户进程状态相关的信息）。（现场保护）</li>
+<li>查找出来发生页面中断的虚拟页面（进程地址空间中的页面）。这个虚拟页面的信息通常会保存在一个硬件寄存器中，如果没有的话，操作系统必须检索程序计数器，取出这条指令，用软件分析该指令，通过分析找出发生页面中断的虚拟页面。（页面定位）</li>
+<li>检查虚拟地址的有效性及安全保护位。如果发生保护错误，则杀死该进程。（权限检查）缺页错误处理过程</li>
+<li>查找一个空闲的页框(物理内存中的页面)，如果没有空闲页框则需要通过页面置换算法找到一个需要换出的页框。</li>
+<li>如果找的页框中的内容被修改了，则需要将修改的内容保存到磁盘上。（注：此时需要将页框置为忙状态，以防页框被其它进程抢占掉）（旧页面写回）</li>
+<li>页框“干净”后，操作系统将保存在磁盘上的页面内容复制到该页框中。</li>
+<li>当磁盘中的页面内容全部装入页框后，向操作系统发送一个中断。操作系统更新内存中的页表项，将虚拟页面映射的页框号更新为写入的页框，并将页框标记为正常状态。（更新页表）</li>
+<li>恢复缺页中断发生前的状态，将程序指针重新指向引起缺页中断的指令。（恢复现场）</li>
+<li>程序重新执行引发缺页中断的指令，进行存储访问。（继续执行）</li>
+</ol>
+<h4 id="页面置换算法">页面置换算法</h4>
+<p>先进先出（First-in, First-out）：先调入内存的页面先被置换出去</p>
+<p>改进的FIFO：A是FIFO队列中最旧的页面，且其放入队列后没有被再次访问，则A被立刻淘汰；否则如果放入队列后被访问过，则将A移到FIFO队列头，并且将访问标志位清除。</p>
+<p>改进的FIFO之Clock：环形队列，产生缺页错误时，当前指针指向C，如果C被访问过，则清除C的访问标志，并将指针指向下一位；如果C没有被访问过，则将新页面放入到C的位置, 置访问标志，并将指针指向下一位。</p>
+<p>最近最少使用（LRU）：设置一个特殊的栈，保存当前使用的各个页面的页面号。每当进程访问某页面时，便将该页面的页面号从栈中移出，将它压入栈顶。栈底始终是最近最久未使用页面的页面号</p>
+<p>老化算法（AGING）：为每个页面设置一个移位寄存器，并设置一位访问位R，每隔一段时间，所有寄存器右移1位，并将R值从左移入</p>
+<h3 id="段式存储">段式存储</h3>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260330113813647.png" alt="image-20260330113813647"></p>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yhua10</div><div class="author-info-description">及时行乐吧 :)</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yhua10" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">神灯祝你好梦，阿拉丁先睡了</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="神秘 bug"/></a><div class="content"><a class="title" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug">神秘 bug</a><time datetime="2026-03-29T15:44:25.224Z" title="Created 2026-03-29 23:44:25">2026-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/27/oo_U1/" title="OO_Unit1"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OO_Unit1"/></a><div class="content"><a class="title" href="/2026/03/27/oo_U1/" title="OO_Unit1">OO_Unit1</a><time datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:48.000Z" title="Created 2026-01-23 00:55:48">2026-01-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cscore/"><span class="card-category-list-name">cscore</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/else/"><span class="card-category-list-name">else</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/OO/" style="font-size: 1.1em; color: #999">OO</a> <a href="/tags/%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E4%BA%8B%E6%83%85/" style="font-size: 1.1em; color: #999">一些有趣的事情</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/03/">
+            <span class="card-archive-list-date">
+              March 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/01/">
+            <span class="card-archive-list-date">
+              January 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yhua10</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script src="https://unpkg.com/aplayer/dist/APlayer.min.js"></script><script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/metingjs/dist/Meting.min.js"></script><meting-js server="netease" type="playlist" id="8705861156" fixed="true" autoplay="false" theme="#409EFF"></meting-js><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>

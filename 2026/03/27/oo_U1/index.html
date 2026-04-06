@@ -1,0 +1,560 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OO_Unit1 | yhua10's Blog</title><meta name="author" content="yhua10"><meta name="copyright" content="yhua10"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="架构 &amp;&amp; 迭代  应用最显著的是递归下降的设计思路。 我的代码分为三块儿大陆：Parser 负责解析，ast 负责整理，algebra 负责输出。三块儿大陆各司其职，立志于不做重复的工作。Parser 里的 Expr 类是它们的交通枢纽。 定义两个数据结构：ast 语法树（以递归下降的形式存储表达式），和 algebra 多项式（以标准输出结构的形式存储表达式）。 如图：尾缀带">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OO_Unit1">
+<meta property="og:url" content="https://yhua10.github.io/2026/03/27/oo_U1/index.html">
+<meta property="og:site_name" content="yhua10&#39;s Blog">
+<meta property="og:description" content="架构 &amp;&amp; 迭代  应用最显著的是递归下降的设计思路。 我的代码分为三块儿大陆：Parser 负责解析，ast 负责整理，algebra 负责输出。三块儿大陆各司其职，立志于不做重复的工作。Parser 里的 Expr 类是它们的交通枢纽。 定义两个数据结构：ast 语法树（以递归下降的形式存储表达式），和 algebra 多项式（以标准输出结构的形式存储表达式）。 如图：尾缀带">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yhua10.github.io/img/11.jpg">
+<meta property="article:published_time" content="2026-03-26T16:19:00.492Z">
+<meta property="article:modified_time" content="2026-04-06T02:18:35.761Z">
+<meta property="article:author" content="yhua10">
+<meta property="article:tag" content="OO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yhua10.github.io/img/11.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "OO_Unit1",
+  "url": "https://yhua10.github.io/2026/03/27/oo_U1/",
+  "image": "https://yhua10.github.io/img/11.jpg",
+  "datePublished": "2026-03-26T16:19:00.492Z",
+  "dateModified": "2026-04-06T02:18:35.761Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "yhua10",
+      "url": "https://yhua10.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/neww.jpg"><link rel="canonical" href="https://yhua10.github.io/2026/03/27/oo_U1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OO_Unit1',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="<%- url_for('/css/custom.css') %>"<meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="bg-animation" id="web_bg" style="background-image: url(https://i.postimg.cc/X7FR4nVj/wei-xin-tu-pian-20260207083752-42-69.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.postimg.cc/fb02jKk1/owl.jpg" alt="Logo"><span class="site-name">yhua10's Blog</span></a><a class="nav-page-title" href="/"><span class="site-name">OO_Unit1</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">OO_Unit1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-04-06T02:18:35.761Z" title="Updated 2026-04-06 10:18:35">2026-04-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/cscore/">cscore</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">3.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>10mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h2 id="架构-迭代">架构 &amp;&amp; 迭代</h2>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/OO/U1/class.png" width="700">
+<p>应用最显著的是递归下降的设计思路。</p>
+<p>我的代码分为三块儿大陆：<code>Parser</code> 负责解析，<code>ast</code> 负责整理，<code>algebra</code> 负责输出。三块儿大陆各司其职，立志于不做重复的工作。<code>Parser</code> 里的 <code>Expr</code> 类是它们的交通枢纽。</p>
+<p>定义两个数据结构：<code>ast</code> 语法树（以递归下降的形式存储表达式），和 <code>algebra</code> 多项式（以标准输出结构的形式存储表达式）。</p>
+<p>如图：尾缀带 <code>Factor</code> 都是继承 <code>Factor</code> 类的（这里无疑用接口更好，但问题不大就懒得改），其中 <code>NumFactor</code> 和 <code>VarFactor</code> 是叶子<code>Factor</code>，别的都是非叶 <code>Factor</code>。<code>Expr</code> 很特殊，它既包含非叶 <code>Factor</code> 的方法，又包含根节点的方法。</p>
+<p><code>Factor</code> 需要实现的方法，最初只有一个：<code>toPoly</code>。</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/OO/U1/ast.png" width="400">
+<p><code>algebra</code> 的标准输出形式最初是 <code>num*x^exponent</code>。</p>
+<p>对于输入的表达式字符串，我首先通过 <code>Parser</code> 将它转化成 <code>ast</code> 的形式来存储。<code>ast</code> 是一棵树，它会自动把表达式整理成递归下降的结构，可以通过根节点 <code>Expr</code> 访问。在 <code>Expr</code> 实现 <code>toPoly</code> 方法，把整理好的语法树导出成多项式的形式，此时已经到达了 <code>algebra</code> 大陆的 <code>Poly</code> 类。在 <code>Poly</code> 实现合并同类项方法和 <code>toString</code> 方法，将结果导出成字符串并输出。</p>
+<p>以上是我的基本思路，具体实现在三次迭代中逐渐填充。</p>
+<p>在迭代中要求实现的功能可以 <strong>按实现路径</strong> 分为 2 类，<strong>函数定义</strong> 和 <strong>函数调用</strong>。前者包括 HW2 中自定义函数的定义和 HW3 中递归函数的定义，实现方式均为通过与之前无异的方法存储一棵语法树作为模板。后者包括 HW2 中 自定义函数、指数函数、选择表达式（函数）的调用，和 HW3 中递归函数，求导（函数）的调用，实现路径为 <code>识别输入字符串中的特定字符 -&gt; 用解析出的实参（因子或者表达式）替换模板中的自变量 -&gt; 把生成的子树挂在目标表达式树中的对应位置</code>，从这个角度想，那个复杂的自定义函数语法树，与 <code>ExpFactor</code> 类没有任何实质上的区别，只是一棵大树一棵小树罢了。</p>
+<h3 id="第一次迭代">第一次迭代</h3>
+<p>就是那个骨架。</p>
+<h3 id="第二次迭代">第二次迭代</h3>
+<blockquote>
+<p>功能一：自定义函数的 <strong>定义</strong> 与 <strong>调用</strong>。</p>
+<p>功能二：指数函数的 <strong>调用</strong>。</p>
+<p>功能三：选择表达式的 <strong>调用</strong>。</p>
+</blockquote>
+<p>需要注意深拷贝的问题，因为函数可以多次被调用，使用浅拷贝会得到几棵纠缠在一起的树。</p>
+<h3 id="第三次迭代">第三次迭代</h3>
+<blockquote>
+<p>功能一：递归函数的 <strong>定义</strong>。</p>
+<p>功能二：递归函数地 <strong>调用</strong>。</p>
+<p>功能三：添加 <code>y</code></p>
+<p>功能四：求导函数的 <strong>调用</strong></p>
+</blockquote>
+<p>有关用来求导的数据结构：<br>
+我的第一反应就是在 <code>ast</code> 里递归下降求导，研讨课时发现多数人采用的在 <code>Poly</code> 里求导，这样对于 <code>dx(x-x)</code> 等情况会更快。</p>
+<p>其实我有一个异想天开的想法，既然给这个项目加功能的路径就那么两条，那能不能实现一个 “<em>加功能</em> 功能” 呢？统一功能接口，然后在加功能的时候写回调函数。当然，这个纯属异想天开。</p>
+<hr>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>CogC</th>
+<th>ev(G)</th>
+<th>iv(G)</th>
+<th>v(G)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Main.main(String[])</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.MonoKey(BigInteger, BigInteger, Poly)</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.equals(Object)</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.getExpArg()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.getXexponent()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.getYexponent()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.hashCode()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.MonoKey.mulMonoKey(MonoKey)</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Poly.Poly()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Poly.add(Poly)</td>
+<td>4</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.Poly.addToSelf(MonoKey, BigInteger)</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.Poly.appendMonoBody(StringBuilder, MonoKey, BigInteger)</td>
+<td><font color  ="red">17</font></td>
+<td>2</td>
+<td><font color  ="red">12</font></td>
+<td><font color  ="red">14</font></td>
+</tr>
+<tr>
+<td>algebra.Poly.appendSign(StringBuilder, BigInteger, boolean)</td>
+<td>6</td>
+<td>1</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>algebra.Poly.buildExpText(Poly)</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>algebra.Poly.constant(BigInteger)</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>algebra.Poly.equals(Object)</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>algebra.Poly.hashCode()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Poly.isFollower(BigInteger, boolean, boolean)</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.Poly.isPureExpFactorLike()</td>
+<td>6</td>
+<td>2</td>
+<td>2</td>
+<td>7</td>
+</tr>
+<tr>
+<td>algebra.Poly.isZero()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Poly.liftMono(Unit)</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>algebra.Poly.multiply(Poly)</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.Poly.negate()</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>algebra.Poly.packExp(StringBuilder, Poly)</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Poly.positiveToFront(ArrayList<MonoKey>)</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>algebra.Poly.pow(BigInteger)</td>
+<td>5</td>
+<td>1</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>algebra.Poly.toString()</td>
+<td>4</td>
+<td><font color  ="red">4</font></td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr>
+<td>algebra.Poly.zero()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>algebra.Unit.Unit(MonoKey, BigInteger)</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>parser.Lexer.getNumber()</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>parser.Lexer.getTokenType(char)</td>
+<td>1</td>
+<td><font color  ="red">18</font></td>
+<td>1</td>
+<td><font color  ="red">20</font></td>
+</tr>
+<tr>
+<td>parser.Lexer.next()</td>
+<td>6</td>
+<td>2</td>
+<td>4</td>
+<td>6</td>
+</tr>
+<tr>
+<td>parser.Lexer.peek()</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>parser.Parser.Parser(Lexer, Definer, DeepDefiner)</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>parser.Parser.parseExpr()</td>
+<td><font color  ="red">17</font></td>
+<td>1</td>
+<td>8</td>
+<td><font color  ="red">11</font></td>
+</tr>
+<tr>
+<td>parser.Parser.parseFactor()</td>
+<td><font color  ="red">19</font></td>
+<td><font color  ="red">11</font></td>
+<td><font color  ="red">13</font></td>
+<td><font color  ="red">15</font></td>
+</tr>
+<tr>
+<td>parser.Parser.parseTerm(int)</td>
+<td>12</td>
+<td>1</td>
+<td>7</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>我的 <code>ast</code> 类都写得很干净，这里就不贴出来了，主要是看 <code>Poly</code> 和 <code>Parser</code>。方法圈复杂度还勉强能看，我把 <code>toString</code> 拆分成几个功能模块之后就没有太恶心的东西了，但 <code>Parser</code> 还是让我很难受，这当然可以通过添加预处理类、降低 <code>ParseFactor</code> 内部的耦合度来解决，但我一直懒于修改。</p>
+<p>不过好在这几个复杂度惊人的方法没给我招来 bug。</p>
+<hr>
+<h2 id="优化">优化</h2>
+<ul>
+<li>这优化可以拿去出国赛了。</li>
+<li>HW1 只有一个正号提前……吧。</li>
+<li>HW2 和 HW3 的优化点相同，都是 <code>exp</code> 内的 gcd 提取和 <code>exp</code> 拆分。
+<ul>
+<li>我在 HW2 引入了 gcd 提取，提取思路是从 gcd 向下枚举因子，记录每个位数下的最大因子，得到一个不超过 10 个元素的候选集，然后暴力。这个方法有点笨，效果也很一般，但也是我想了挺久才想出来的，我最终找到一个性能最好而且在互测中不可能被 hack 的临界点，超过这个临界点就不记录、仅尝试 <code>gcd</code>、<code>gcd/2</code>……<code>gcd/100</code> 。我后来知道其实最优解一定出在 <code>gcd</code> ~ <code>gcd/0</code> 之间，可惜数学能力不够，完全没往这个方向想。</li>
+<li>我在 HW3 引入了 <code>exp</code> 拆分，这个拆东墙南墙补西墙北墙的最优化问题，我想到的唯一一个解法是动态规划，实现的……还算可以，能看到效果。但是由于处理不完整造成了 bug，这个后面再说。</li>
+</ul>
+</li>
+</ul>
+<h2 id="几个显著的问题">几个显著的问题</h2>
+<ul>
+<li>组合优于继承，但我一开始就用了抽象类而非接口，后来懒得改。</li>
+<li>没有预处理方法，事实证明 <code>PreProcesser</code> 的存在可以省下很大功夫，前两次还看不太出来，第三次就很闹心了。直接导致 <code>Lexer</code> 爆复杂度和 <code>DeepDefiner</code> 又丑又长。如果再有类似的东西我一定要写预处理。</li>
+<li><code>exp</code> 类没有指数字段，也没有什么灵活的修改空间，间接导致我 HW3 优化出锅（因为优化完的东西没法存）。</li>
+</ul>
+<h2 id="自动化评测方法">自动化评测方法</h2>
+<p>我纯古法的数据生成器。采用递归下降+模块式生成的方法。写生成器的过程中遇到了很多问题：递归以及递归下降层数限制、<code>Expr</code> 一类两用、是否允许 <code>y</code>、是否允许选择式……我最终给模块式生成整理出一套参数：<code>(depth, isFactor, allowFunc=True, allowChoose=True, allowDeri=True, allowRec=True, allowY=True)</code>，以更好地复用函数。</p>
+<p>这个评测机在 HW1 中找出了自己的一个 bug，在 HW2 中找出了两位同学的 bug。但它有诸多不足，他没能测出 HW2 强测我的 bug，也没能测出 HW2 中我室友的 bug，前者是由于那个 bug 就是不好用自动化方法测出来，后者是因为我的数据生成器生成的选择表达式 <code>==</code> 两边只有同类型数据。</p>
+<h2 id="bugs-互测">bugs &amp;&amp; 互测</h2>
+<p>在 HW2 强测中出现 1 个 bug。在 HW3 互测中优化出 2 个 bug 被刀了 4 次。HW2 有效 hack 9 次，HW3 有效 hack 3 次。</p>
+<h3 id="HW2">HW2</h3>
+<p><strong>强测</strong>  WA 了一个点，WA 进 b 房了😿：实在有点愚蠢，我把 <code>PowFactor</code> 里的指数改成了 <code>BigInteger</code>，但 <code>Poly</code> 里还是 <code>int</code>，面对 <code>(((((((((x^8)^8)^8)^8)^8)^8)^8)^8)^8)</code> 理所当然的溢出了。</p>
+<p>我需要反思一下，为什么我的评测机没有查到这个点呢？其实是我的数据生成器太随机了，我只按照题目的要求写了格式规范，至于它具体生成什么全权交给 <code>random</code> 决定了。当然，我也有通过改变权重、改变常数范围的方式加强我的评测机，但幂次足够高的数据往往伴随着爆代价导致的 TLE，因此我 <code>Poly</code> 里使用 <code>int</code> 的 bug 完全被 TLE 掩盖了。</p>
+<p>其实也怪我懒于手动构造数据，但我清晰地记得我刚进 HW2 就把 <code>PowFactor</code> 里的数据类型给改了，所以根本没想过自己会在这里出问题。还有，这种 “不对称” 问题 AI 应该是很好查的，我下次要交之前让 AI 给我盯一盯。</p>
+<p><strong>互测</strong>：像 <code>(((((((((x^8)^8)^8)^8)^8)^8)^8)^8)^8)</code> 这种点在互测是非法的，所以我没有在互测期间发现自己的 bug，也没被刀。</p>
+<p>有个一穿 3 的点是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">f(x)=(x+1)^8</span><br><span class="line">[(1==1)?1:f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f(f((x+1)))))))))))))))))))))))))))))]</span><br></pre></td></tr></table></figure>
+<p>简单粗暴有效。制裁使用字符串替换（除了能写明白这个的大佬之外）/随意实例化的人。</p>
+<p>另有一个一穿 4 的点是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0</span><br><span class="line">[(0==0)?1:((((((x+1)^8)^8)^8)^8)^8)^8]</span><br></pre></td></tr></table></figure>
+<p>这个 cost 计算很阴啊，我自己能过是幸运的，因为我到互测才知道这个问题。</p>
+<p>还有一位代码处理不了连续符号的同学，他无法通过我的评测机的任何一个数据点，结果误伤了他好几次，私密马赛。</p>
+<p>总之这个房间很欢乐。</p>
+<h3 id="HW3">HW3</h3>
+<p>强测没事儿。互测被 hack 惨了。</p>
+<p>一个 bug 是很多人都中招了的，乘开优化少括号的问题。在 HW2 中，为了判断 <code>exp</code> 需不需要套一层括号，我写了一个 <code>isPureFactor</code> 方法，判断一个 <code>Term</code> 是否只是 <code>Factor</code>，判断方法为 <code>constExit + xExit + yExit + ExpExit &lt;= 1</code>。显然，对于 <code>exp -&gt; exp*exp</code> 的情况，这里会少一个括号。</p>
+<p>另一个 bug 是类似 <code>exp((2*exp((2*exp((2*exp(x)))))))</code> 加函数嵌套。我在做优化的时候有考虑 TLE 的问题，所以我加了限制：项数增加到一定程度就不做优化了，可我没有考虑多层嵌套超时的问题。</p>
+<p>不过没关系，优化开关一关，都是同质 bug😉。</p>
+<h2 id="心得体会">心得体会</h2>
+<p>我习惯于先设计架构，再把所有的类和空方法都建出来，最后再填充具体实现，这样看着自己设计的骨架一点点长出血肉，当然每次都会经历断骨再生就是了。虽然后续的迭代过程很小心，但还是眼睁睁看着我的代码变得奇形怪状。</p>
+<p>我认为本次设计最大的优点是功能清晰，没有出现 <code>oopre</code> 中出现的 “不知道有什么用的类”、“走错类的方法” 和 “互抢生意的兄弟类（甚至父子类）”。最大的缺点在于方法内部存在大量冗余逻辑，导致一些方法（特指 <code>parseFactor</code> 和 <code>toString</code>）又丑又长，甚至 checkstyle 不过、被迫拆分。</p>
+<p>唯一一次 AI 生成代码是 exp 拆分的优化（因为实在写不动了），我写好了状压 dp 的状态转移逻辑和优化接口，让 AI 填充了代码。除此之外均为古法编程。其实想想如果自己只写模块接口、让 AI 填内容的话也不错，但如果说古法编程没有意义所以没必要做的话，反正我也干不出什么必须要做的事，所以能自己写一天是一天吧。</p>
+<p>另外，感觉做优化是很值得的，前提是知道自己在做什么，能保证不影响通过强测。我做了挺多优化，收益不算高但也有一点，代价基本为 0。强测对优化还是很温柔的，没揪着优化的易错点打，最后一次互测因为没注意到 <code>exp</code> 嵌套那个问题被刀了，但反正关掉优化只需要改个接口，用不了两分钟。</p>
+<p>这个月的 oo 命途多舛，听说下个月的电梯更阴间，还是在清明假期……我可能要带着 oo 爬山了。</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://dl4.weshineapp.com/gif/20170906/72ae6e4e617a5ea4bf6e8f301f801343.gif?f=micro_54is5bGx" alt="img"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://yhua10.github.io">yhua10</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://yhua10.github.io/2026/03/27/oo_U1/">https://yhua10.github.io/2026/03/27/oo_U1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/OO/">OO</a></div><div class="post-share"><div class="social-share" data-image="/img/11.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">神秘 bug</div></div><div class="info-2"><div class="info-item-1"> 在注入里修改了夜间模式下的头像，后又突发奇想在本土 iml 下启用了头像旋转效果。然后我得到了……一轮旋转的满月。 特此纪念。   </div></div></div></a><a class="pagination-related" href="/2026/01/23/hello-world/" title="Hello World"><img class="cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick Start Create a new post 1$ hexo new &quot;My New Post&quot; More info: Writing Run server 1$ hexo server More info: Server Generate static files 1$ hexo generate More info: Generating Deploy to remote sites 1$ hexo deploy More info: Deployment </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yhua10</div><div class="author-info-description">及时行乐吧 :)</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yhua10" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">神灯祝你好梦，阿拉丁先睡了</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84-%E8%BF%AD%E4%BB%A3"><span class="toc-number">1.</span> <span class="toc-text">架构 &amp;&amp; 迭代</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%BF%AD%E4%BB%A3"><span class="toc-number">1.1.</span> <span class="toc-text">第一次迭代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E8%BF%AD%E4%BB%A3"><span class="toc-number">1.2.</span> <span class="toc-text">第二次迭代</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1%E8%BF%AD%E4%BB%A3"><span class="toc-number">1.3.</span> <span class="toc-text">第三次迭代</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%98%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%A0%E4%B8%AA%E6%98%BE%E8%91%97%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">几个显著的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E8%AF%84%E6%B5%8B%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">自动化评测方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bugs-%E4%BA%92%E6%B5%8B"><span class="toc-number">5.</span> <span class="toc-text">bugs &amp;&amp; 互测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HW2"><span class="toc-number">5.1.</span> <span class="toc-text">HW2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HW3"><span class="toc-number">5.2.</span> <span class="toc-text">HW3</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%83%E5%BE%97%E4%BD%93%E4%BC%9A"><span class="toc-number">6.</span> <span class="toc-text">心得体会</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="神秘 bug"/></a><div class="content"><a class="title" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug">神秘 bug</a><time datetime="2026-03-29T15:44:25.224Z" title="Created 2026-03-29 23:44:25">2026-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/27/oo_U1/" title="OO_Unit1"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OO_Unit1"/></a><div class="content"><a class="title" href="/2026/03/27/oo_U1/" title="OO_Unit1">OO_Unit1</a><time datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:48.000Z" title="Created 2026-01-23 00:55:48">2026-01-23</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yhua10</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><script src="https://unpkg.com/aplayer/dist/APlayer.min.js"></script><script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/metingjs/dist/Meting.min.js"></script><meting-js server="netease" type="playlist" id="8705861156" fixed="true" autoplay="false" theme="#409EFF"></meting-js><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>
