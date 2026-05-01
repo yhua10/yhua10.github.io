@@ -43,7 +43,8 @@ body {
 
 /* 正文页面 */
 #post {
-  background: rgba(248, 249, 250, 0.6) !important;
+  /*background: rgba(248, 249, 250, 0.6) !important;*/
+  background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(6px);
   border-radius: 15px;
   transition: 0.3s ease;
