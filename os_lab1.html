@@ -1,0 +1,418 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OS_lab1 | yhua10's Blog</title><meta name="author" content="yhua10"><meta name="copyright" content="yhua10"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Thinking 1.1   尝试分别使用实验环境中的原生 x86 工具链（gcc、ld、readelf、objdump 等）和 MIPS 交叉编译工具链（带有mips-linux-gnu- 前缀，如 mips-linux-gnu-gcc、mips-linux-gnu-ld），重复其中的编译和解析过程，观察相应的结果，并解释其中向 objdump 传入的参数的含义。  写了一个 night.c 程">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OS_lab1">
+<meta property="og:url" content="https://yhua10.github.io/os_lab1.html">
+<meta property="og:site_name" content="yhua10&#39;s Blog">
+<meta property="og:description" content="Thinking 1.1   尝试分别使用实验环境中的原生 x86 工具链（gcc、ld、readelf、objdump 等）和 MIPS 交叉编译工具链（带有mips-linux-gnu- 前缀，如 mips-linux-gnu-gcc、mips-linux-gnu-ld），重复其中的编译和解析过程，观察相应的结果，并解释其中向 objdump 传入的参数的含义。  写了一个 night.c 程">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yhua10.github.io/img/neww.jpg">
+<meta property="article:published_time" content="2026-05-01T06:50:40.268Z">
+<meta property="article:modified_time" content="2026-03-29T16:35:33.164Z">
+<meta property="article:author" content="yhua10">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yhua10.github.io/img/neww.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/neww.jpg"><link rel="canonical" href="https://yhua10.github.io/os_lab1.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OS_lab1',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="<%- url_for('/css/custom.css') %>"<meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="bg-animation" id="web_bg" style="background-image: url(https://i.postimg.cc/X7FR4nVj/wei-xin-tu-pian-20260207083752-42-69.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.postimg.cc/fb02jKk1/owl.jpg" alt="Logo"><span class="site-name">yhua10's Blog</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">OS_lab1</h1></header><main class="layout" id="content-inner"><div id="page"><div class="page-title">OS_lab1</div><div class="container" id="article-container"><h3 id="Thinking-1-1">Thinking 1.1</h3>
+<hr>
+<blockquote>
+<p>尝试分别使用实验环境中的原生 x86 工具链（gcc、ld、readelf、objdump 等）和 MIPS 交叉编译工具链（带有mips-linux-gnu- 前缀，如 mips-linux-gnu-gcc、mips-linux-gnu-ld），重复其中的编译和解析过程，观察相应的结果，并解释其中向 objdump 传入的参数的含义。</p>
+</blockquote>
+<p>写了一个 <code>night.c</code> 程序作为实验对象：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span> <span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span> (<span class="string">&quot;Night fall...\n&quot;</span>);</span><br><span class="line">        <span class="built_in">printf</span> (<span class="string">&quot;Sleep well, wake well.&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -E night.c</span><br></pre></td></tr></table></figure>
+<p>前面补上一大堆 <code>typedef</code> 、<code>struct</code> 和 <code>extern</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -c night.c</span><br></pre></td></tr></table></figure>
+<p><code>night.o</code> 自然是看不懂的，我在线查看了一下对应的十六进制和二进制，自然还是啥也没看懂：</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325000727645.png" alt="image-20260325000727645"></p>
+<p>反汇编：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -DS night.o &gt; night.s</span><br></pre></td></tr></table></figure>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325001139378.png" alt="image-20260325001139378"></p>
+<p>文件格式：elf64-x86-64</p>
+<p>用交叉编译工具链 gcc + 反汇编出的是  elf32-tradbigmips，看起非常亲切（终于有个能看懂的了）</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325112659865.png" alt="image-20260325112659865"></p>
+<p><code>readelf</code></p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325113044240.png" alt="image-20260325113044240"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325113101285.png" alt="image-20260325113101285"></p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325113159790.png" alt="image-20260325113159790"></p>
+<p>发现 Entry Point 不同，正常，ABI 不同，start_ 也不同；</p>
+<p>发现连 段头/节头 的数目都不同，MIPS 少一些。</p>
+<p><code>objdump</code> 中的参数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-S	# 尽量 “源代码 + 汇编混合显示”，但我没加 -g 调试模式，所以没起效</span><br><span class="line">-D	# 所有 section，不止 .text</span><br></pre></td></tr></table></figure>
+<h3 id="Thinking-1-2">Thinking 1.2</h3>
+<hr>
+<blockquote>
+<p>• 尝试使用我们编写的 readelf 程序，解析之前在 target 目录下生成的内核 ELF 文件。</p>
+<p>• 也许你会发现我们编写的 readelf 程序是不能解析 readelf 文件本身的，而我们刚才介绍的系统工具 readelf 则可以解析，这是为什么呢？（提示：尝试使用 readelf-h，并阅读 tools/readelf 目录下的 Makefile，观察 readelf 与 hello 的不同）</p>
+</blockquote>
+<p><strong>实验：</strong></p>
+<p>用我们编写的 <code>readelf</code> 文件解析 <code>target/mos</code> 的结果是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">0:0x0</span><br><span class="line">1:0x80020000</span><br><span class="line">2:0x800220b0</span><br><span class="line">3:0x800220c8</span><br><span class="line">4:0x800220e0</span><br><span class="line">5:0x0</span><br><span class="line">6:0x0</span><br><span class="line">7:0x0</span><br><span class="line">8:0x0</span><br><span class="line">9:0x0</span><br><span class="line">10:0x0</span><br><span class="line">11:0x0</span><br><span class="line">12:0x0</span><br><span class="line">13:0x0</span><br><span class="line">14:0x0</span><br><span class="line">15:0x0</span><br><span class="line">16:0x0</span><br><span class="line">17:0x0</span><br><span class="line">18:0x0</span><br></pre></td></tr></table></figure>
+<p>而用系统工具 <code>readelf</code> 解析结果是（我用的是 <code>-a</code> ，太长了，省略部分）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">ELF 头：</span><br><span class="line">  Magic：   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 </span><br><span class="line">  类型:                              EXEC (可执行文件)</span><br><span class="line">  系统架构:                          MIPS R3000</span><br><span class="line">  入口点地址：               0x80021c60</span><br><span class="line">  程序头起点：          52 (bytes into file)</span><br><span class="line">  Start of section headers:          23976 (bytes into file)</span><br><span class="line">  Size of this header:               52 (bytes)</span><br><span class="line">  Size of program headers:           32 (bytes)</span><br><span class="line">  Number of program headers:         4</span><br><span class="line">  Size of section headers:           40 (bytes)</span><br><span class="line">  Number of section headers:         19</span><br><span class="line">节头：</span><br><span class="line">  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al</span><br><span class="line">  [ 0]                   NULL            00000000 000000 000000 00      0   0  0</span><br><span class="line">  [ 1] .text             PROGBITS        80020000 0000c0 0020b0 00 WAX  0   0 16</span><br><span class="line">.......</span><br><span class="line">程序头：</span><br><span class="line">  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align</span><br><span class="line">  ABIFLAGS       0x002188 0x800220c8 0x800220c8 0x00018 0x00018 R   0x8</span><br><span class="line">  REGINFO        0x002170 0x800220b0 0x800220b0 0x00018 0x00018 R   0x4</span><br><span class="line">......</span><br><span class="line">There is no dynamic section in this file.</span><br><span class="line">该文件中没有重定向信息</span><br><span class="line">......</span><br><span class="line">ISA: MIPS32</span><br><span class="line">GPR size: 32</span><br><span class="line">CPR1 size: 32</span><br><span class="line">CPR2 size: 0</span><br><span class="line">FP ABI: Hard float (32-bit CPU, Any FPU)</span><br><span class="line">.......</span><br></pre></td></tr></table></figure>
+<p>系统 <code>readelf</code> 解析我的 <code>readelf</code>：</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325135528080.png" alt="image-20260325135528080"></p>
+<p>我发现我的 <code>readelf</code> 有重定位节。</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325140345360.png" alt="image-20260325140345360"></p>
+<p>我的 <code>readelf</code> 自我解析 &amp;&amp; 我的 <code>readelf</code> 解析系统 <code>readelf</code>：</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325142737403.png" alt="image-20260325142737403"></p>
+<p>解析出来俩空文件。</p>
+<p>系统的 <code>readelf</code> 自我解析：</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:%5CUsers%5Clegion%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20260325142542674.png" alt="image-20260325142542674"></p>
+<p><strong>思考：</strong></p>
+<ul>
+<li>为什么我的 <code>resdelf</code> 不能自我解析？注意到虽然解析输出为空但并没有报错，应该不是 “自己解析自己” 这个操作不允许。我认为是由于我们的 <code>readelf</code> 并非完全版，是针对 <code>MOS</code> 内核的（比如默认了一些取值 🤔），我们的 <code>readelf</code> 自身显然不是内核，所以解析不出来。</li>
+<li>对哦，我们的 <code>readelf</code> 全是针对 32 位的，但它自己能在宿主机运行，那肯定是 64 位的，所以解析不了。</li>
+<li>系统的 “通用 readelf“ 自然是通用的。</li>
+</ul>
+<h3 id="Thinking-1-3">Thinking 1.3</h3>
+<hr>
+<blockquote>
+<p>在理论课上我们了解到，MIPS 体系结构上电时，启动入口地址为 0xBFC00000（其实启动入口地址是根据具体型号而定的，由硬件逻辑确定，也有可能不是这个地址，但一定是一个确定的地址），但实验操作系统的内核入口并没有放在上电启动地址，而是按照内存布局图放置。思考为什么这样放置内核还能保证内核入口被正确跳转到？</p>
+<p>（提示：思考实验中启动过程的两阶段分别由谁执行。）</p>
+</blockquote>
+<ul>
+<li>pre：两阶段由谁执行：
+<ul>
+<li>CPU 固定复位到 BootLoader，这个由硬件执行。</li>
+<li>BootLoader 引导 CPU 跳到内核，这个由 BootLoader 执行。</li>
+</ul>
+</li>
+<li>所以为什么：
+<ul>
+<li>CPU 本身不认识内核入口，但 BootLoader 认识，BootLoader 会通过 ELF 头找到和内核的契约，然后引导 CPU 跳过去。</li>
+<li>欸？所以 BootLoader 也是一种 <code>readelf</code> ？还是说它只是接受 <code>readelf</code> 解析出的结果？🤔
+<ul>
+<li>关键 BootLoader 起作用的时候 <code>readelf</code> 还不在运行链路里啊。
+<ul>
+<li>GPT 说 BootLoader 包含一小段和 <code>readelf</code> 相似的逻辑，来解析 ELF 头。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="交叉编译：">交叉编译：</h3>
+<p>编译器生成的 <strong>目标代码</strong> 与 <strong>编译器本身</strong> 在不同的平台上运行。为什么要交叉编译？因为 QEMU 模拟的是 MIPS 平台环境，我们的 MOS 是在 MIPS 上跑的；而我们的跳板机显然是在 X86 上跑的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc</span><br><span class="line">mips-linux-gnu-gcc # 用一个运行在 x86 上的程序，生成给 MIPS 用的程序</span><br></pre></td></tr></table></figure>
+<h3 id="QEMU-的简化版启动：">QEMU 的简化版启动：</h3>
+<blockquote>
+<p>QEMU 模拟器支持直接加载 ELF 格式的内核，也就是说，QEMU 已经提供了 bootloader 的引导（启动）功能。MOS 操作系统不需要再实现 bootloader的功能。</p>
+</blockquote>
+<p>我们在理论课上学习了相当复杂的启动流程，主要包括 ① BootLoader 引导 ② 硬件环境逐步复苏 ③ 将内核加载到内存中的指定位置 ④ CPU 跳转到内核入口执行。而 QEMU 模拟器帮我们实现了大部分，启动流程被简化为 ③④。</p>
+<h3 id="启动">启动</h3>
+<p><code>init/start.S</code> 中的 <code>_start</code> 函数是 CPU 控制权被转交给内核后执行的第一个函数，主要工作是初始化 CPU 和栈指针，为之后的内核初始化做准备。最后跳到 <code>init.c</code> 中的 <code>mips_init</code>。观察 <code>mips_init</code> 发现它只是一个占位的东西，还没有实现任何内核相关内容。</p>
+<p>所以其实我们 lab1 干的事儿跟内核啥关系没有。</p>
+<h3 id="Makefile：">Makefile：</h3>
+<p>上来就是一句：<code>.ONESHELL:</code> 意味着我们可以不去注意 Makefile 中 “换行即换 shell“ 这件事。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Lab1</span><br><span class="line">  |- Makefile</span><br><span class="line">  |- lib</span><br><span class="line">  	  |- Makefile</span><br><span class="line">  |- init</span><br><span class="line">  	  |- Makefile</span><br><span class="line">  |- kernel</span><br><span class="line">  	  |- Makefile</span><br></pre></td></tr></table></figure>
+<p>Makefile 里的东西很多很杂，而且不乏涉及到一些与实验无关内容，我没有试图完全理解，下面挑重点描述：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">target_dir              := target	<span class="comment"># 最终的 MOS 构建目标所在目录</span></span><br><span class="line">mos_elf                 := <span class="variable">$(target_dir)</span>/mos	<span class="comment"># 我们要完成的操作系统其实就是个 ELF 文件</span></span><br><span class="line">link_script             := kernel.lds	</span><br><span class="line"><span class="comment"># Linker Script 是用来指导链接器将多个 .o 文件链接成目标可执行文件的脚本</span></span><br><span class="line">modules                 := lib init kern	<span class="comment"># 子模块</span></span><br><span class="line">targets                 := <span class="variable">$(mos_elf)</span>	</span><br></pre></td></tr></table></figure>
+<p>简要阅读 Makefile 即可发现，其中存在大量 “指来指去” 的内容，化简完如下：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">all: <span class="variable">$(mos_elf)</span></span></span><br><span class="line"><span class="variable">$(mos_elf)</span>: <span class="variable">$(modules)</span> <span class="variable">$(target_dir)</span>	<span class="comment"># $(LD) 链接所有目标文件</span></span><br><span class="line">	<span class="variable">$(LD)</span> <span class="variable">$(LDFLAGS)</span> -o <span class="variable">$(mos_elf)</span> -N -T <span class="variable">$(link_script)</span> <span class="variable">$(objects)</span></span><br><span class="line"><span class="variable">$(target_dir)</span>:</span><br><span class="line">	mkdir -p <span class="variable">$@</span></span><br><span class="line"><span class="variable">$(modules)</span>: 	<span class="comment"># 进入各个子目录（子模块）进行 Make</span></span><br><span class="line">	<span class="variable">$(MAKE)</span> --directory=<span class="variable">$@</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	for d in * tools/readelf user/* tests/*; do	 <span class="comment"># 遍历所有目录，寻找其内部 Makefile 并执行 clean</span></span><br><span class="line">		if [ -f $$d/Makefile ]; then</span><br><span class="line">			<span class="variable">$(MAKE)</span> --directory=$$d clean</span><br><span class="line">		fi</span><br><span class="line">	done</span><br><span class="line">	rm -rf *.o *~ <span class="variable">$(target_dir)</span> <span class="keyword">include</span>/generated</span><br><span class="line">	find . -name &#x27;*.objdump&#x27; -exec rm &#123;&#125; &#x27;;&#x27;</span><br><span class="line"><span class="section">run:</span></span><br><span class="line">	<span class="variable">$(QEMU)</span> <span class="variable">$(QEMU_FLAGS)</span> -kernel <span class="variable">$(mos_elf)</span></span><br></pre></td></tr></table></figure>
+<p>注意这里没有像通常那样把 <code>all</code> 作为第一个（默认）规则，而是 <code>clean-and-all</code>，可能是出于方便考虑，我们无需手动清理之前生成的副产物，直接 <code>make</code> 就行。注意评测命令是 <code>make &amp;&amp; make run</code>。</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="C:\Users\legion\AppData\Roaming\Typora\typora-user-images\image-20260324231150102.png" alt="image-20260324231150102"  />
+<h3 id="变长参数列表">变长参数列表</h3>
+<p>比如这段代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">printk</span><span class="params">(Const chsr *fmt, ...)</span> &#123;</span><br><span class="line">    va_list ap;</span><br><span class="line">    va_start(ap, fmt);</span><br><span class="line">    vprintfmt(outputk, <span class="literal">NULL</span>, fmt, ap);</span><br><span class="line">    va_end(ap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">va_list ap; <span class="comment">// 变长参数</span></span><br></pre></td></tr></table></figure>
+<p>初始化变长参数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">va_start(ap, fmt <span class="comment">/* 指向 ... 前的最后一个参数 */</span>); </span><br></pre></td></tr></table></figure>
+<p>（连续多次地）使用 <code>va_arg</code> 来接受 … 里的参数，比如 <code>va_arg(ap, int);</code> 就会读到一个 <code>int</code> 类型的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a = va_arg(ap <span class="comment">/*...*/</span>, <span class="type">int</span> <span class="comment">/* 指定接受参数的类型 */</span>);</span><br><span class="line"><span class="type">int</span> b = va_arg(ap, <span class="type">long</span>);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>注意这里最少接受 4 个字节的参数，<code>char</code> 不允许。</p>
+<p>最后：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">va_end(ap);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>有关为什么 <code>printk</code> 为什么要使用回调函数，因为输出函数不只有 <code>printk</code>，（还有 <code>print</code> ,<code>printf</code>, <code>sprintf</code>……），都使用 <code>vprintfmt</code> 接口，通过指定（设计）回调函数来指定（设计）输出方式。</p>
+</blockquote>
+<h3 id="ELF">ELF:</h3>
+<blockquote>
+<p>先看 <code>elf.h</code>。</p>
+<p>我对 <code>.h</code> 文件 0 了解，所以刚看到 <code>elf.h</code> 是懵的，因为在我的认知中，<code>struct</code> 中变量出现的先后顺序是无所谓的，但这里显然要用变量在 <code>struct</code> 中出现的顺序取对应它们在 <code>ELF</code> 中出现的顺序。</p>
+<p>总的来说，ELF 里 文件头 肯定是最先出现的，剩下的 节/段 出现（其实是指解析）的顺序取决于 ELF 头中指定的偏移量（大致上是无所谓的），【节/段 内部的顺序严格对应 <code>elf.h</code> 中规定的顺序】【并非如此】</p>
+</blockquote>
+<p>有问题。</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://upload.wikimedia.org/wikipedia/commons/7/77/Elf-layout--en.svg" alt="Executable and Linkable Format - Wikipedia" style="zoom:30%;" />
+<blockquote>
+<p>P.S. 这张图我忘了是哪儿来的了，可能是从哪位学长或者学姐的博客里拿来的……反正不是我自己画的</p>
+</blockquote>
+<h3 id="C-语言相关">C 语言相关</h3>
+<p>C 语言环境分为 <code>Freestanding</code> 和 <code>Hosted</code> 两种，前者有操作系统支持，后者没有。显然没有操作系统支持的 <code>Freestanding</code> 不可能支持 <code>I/O</code> 操作，所以 我们使用的 <code>Freestanding</code> C 语言环境 + 我们实现的 <code>I/O</code> 操作 ➡️ 能进行 I/O 操作的 C 语言环境。</p>
+<p>独立环境下能使用的头文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;<span class="type">float</span>.h&gt;  </span><br><span class="line">&lt;iso646.h&gt;</span><br><span class="line">&lt;limits.h&gt;</span><br><span class="line">&lt;stdarg.h&gt;</span><br><span class="line">&lt;stdbool.h&gt;</span><br><span class="line">&lt;stddef.h&gt;</span><br><span class="line">&lt;stdint.h&gt;</span><br></pre></td></tr></table></figure>
+<p>然后我们下发的代码又给我们补了一些，比如说 <code>string.h</code>，里面的也是我们能直接用的。</p>
+<h3 id="回调函数-printk">回调函数 &amp;&amp; printk</h3>
+<p>这四个代码一眼看上去有点乱。<code>printk.c</code> 和 <code>print.c</code> 如胶似漆（各种相互调用），<code>print.h</code> 和 <code>printk.h</code> 存在感模糊。</p>
+<p><code>printk.c</code> 的 <code>outputk</code> 到 <code>print.c</code> 里还改了个名字叫做 <code>out</code>，我一开始在根目录下 <code>grep -r &quot;out&quot;</code> 啥也没找着。</p>
+<blockquote>
+<p>我后来明白为什么要改名字了。<code>outputk</code> 只是 <code>printk</code> 对应的输出方式（输出到 stdout），如果，我要加一个 <code>sprinfmt</code>，我给它写一个，比方说，<code>soutput</code>，那 <code>soutput</code> 也要走 <code>out</code> 接口，如果还管他叫 <code>outputk</code> 就不合适了。</p>
+</blockquote>
+<p>其实就是这样：⬇️</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="D:\blog\hexo-blog\source\img\OS\Lab1\func.png" style="zoom:67%;" />
+<p>回调函数首先是在 <code>print.h</code> 中出现的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">fmt_callback_t</span>)</span><span class="params">(<span class="type">void</span> *data, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> len)</span>;</span><br></pre></td></tr></table></figure>
+<p>这里命名了一个函数指针类型 <code>fmt_callback_t</code>，其指向的函数格式为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">somedef</span><span class="params">(<span class="type">void</span> *data, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> len)</span></span><br></pre></td></tr></table></figure>
+<p>它被用在 <code>vprintfmt</code> 里：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">vprintfmt</span><span class="params">(<span class="type">fmt_callback_t</span> out, <span class="type">void</span> *data, <span class="type">const</span> <span class="type">char</span> *fmt, va_list ap)</span>;</span><br></pre></td></tr></table></figure>
+<p>这里的注释挺详细的，奈何我不懂英文。</p>
+<p>注释：</p>
+<blockquote>
+<p><code>vprintfmt</code> 是一个格式化函数，它允许使用不同的后端（即输出目标）来完成打印。它接收四个参数：</p>
+<ul>
+<li>
+<p><code>fmt_callback_t out</code>：一个指向输出目标的函数指针，这个输出目标函数负责接收 <code>vprintfmt</code> 生成的格式化输出。</p>
+</li>
+<li>
+<p><code>void *data</code>：一个上下文指针，会被传递给 <code>out</code> 回调函数。它可以用来保存与具体输出目标相关的额外数据。</p>
+</li>
+<li>
+<p><code>const char *fmt</code>：格式字符串，和 <code>printf</code> 的格式字符串类似。</p>
+</li>
+<li>
+<p><code>va_list ap</code>：可变参数列表，提供要被格式化的那些参数。</p>
+</li>
+</ul>
+<p>格式化回调函数 <code>out</code> 接收下面这些参数：</p>
+<ul>
+<li><code>void *data</code>
+<ul>
+<li>就是传给 <code>vprintfmt</code> 的那个同一个 <code>data</code> 指针。</li>
+</ul>
+</li>
+<li><code>const char *buf</code>
+<ul>
+<li>指向一个缓冲区，这个缓冲区里存放的是 <code>vprintfmt</code> 生成好的格式化输出。</li>
+</ul>
+</li>
+<li><code>size_t len</code>
+<ul>
+<li>这个缓冲区中有多少字节有效。</li>
+</ul>
+</li>
+</ul>
+<p>注意，这个缓冲区不一定以 <code>\0</code> 结尾，而且里面还可能包含嵌入的 <code>\0</code> 字节，因此输出目标在处理时，应该把 <code>len</code> 当作真正需要输出的长度。</p>
+<blockquote>
+<p>也就是说，这里的字符串输出并非像我们平时用的读到 ‘\0’ 自动结束，而是从 buf[0] 到 buf[len-1]，输完为止。</p>
+</blockquote>
+</blockquote>
+<p>具体表现为 <code>printk.c</code> 中的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 正 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">outputk</span><span class="params">(<span class="type">void</span> *data, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">		printcharc(buf[i]);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 误 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">outputk</span><span class="params">(<span class="type">void</span> *data, <span class="type">const</span> <span class="type">char</span> *buf, <span class="type">size_t</span> len)</span> &#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>, buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本质上就是 <code>print.c</code> 和 <code>printk.c</code> 里函数的相互调用。</p>
+<p>这里的 <code>*fmt</code> 都是用户程序提供的格式化字符串，比如说 <code>&quot;%s, %-4d&quot;</code>，<code>*buf</code> 都是整理好准备输出的字符串，比如说 <code>&quot;hello, 3   &quot;</code>。</p>
+<p>这里还有个很有意思的事儿，先把负数取绝对值再连同负号输出这件事，学过程设的应该很敏感，整数的表示范围它不对称啊，遇到最小负数那不炸了吗？这里的 <code>num</code> 是 <code>long</code> 类型，那 <code>INT_MIN</code> 没事儿，<code>LONG_MIN</code> 肯定出锅啊。</p>
+<h3 id="scancharc"><code>scancharc</code></h3>
+<p>lab1 没有任何涉及到输入的上层实现，但我发现 <code>machine.c</code> 里有一个孤零零的 <code>scancharc</code>，它和 <code>printcharc</code> 差不多，都是最底层的硬件实现。</p>
+<p>我仿照 <code>outputk</code> 写了一个 <code>inputk</code>：</p>
+<p><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="D:%5Cblog%5Chexo-blog%5Csource%5Cimg%5COS%5CLab1%5Cinputk.png" alt="image-20260329143343268"></p>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yhua10</div><div class="author-info-description">及时行乐吧 :)</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yhua10" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">神灯祝你好梦，阿拉丁先睡了</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="神秘 bug"/></a><div class="content"><a class="title" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug">神秘 bug</a><time datetime="2026-03-29T15:44:25.224Z" title="Created 2026-03-29 23:44:25">2026-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/27/oo_U1/" title="OO_Unit1"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OO_Unit1"/></a><div class="content"><a class="title" href="/2026/03/27/oo_U1/" title="OO_Unit1">OO_Unit1</a><time datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:48.000Z" title="Created 2026-01-23 00:55:48">2026-01-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cscore/"><span class="card-category-list-name">cscore</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/else/"><span class="card-category-list-name">else</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E4%BA%8B%E6%83%85/" style="font-size: 1.1em; color: #999">一些有趣的事情</a> <a href="/tags/BUAA-OO/" style="font-size: 1.1em; color: #999">BUAA_OO</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/03/">
+            <span class="card-archive-list-date">
+              March 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/01/">
+            <span class="card-archive-list-date">
+              January 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yhua10</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script><meting-js server="netease" type="playlist" id="3778678" fixed="true" autoplay="false"></meting-js><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>

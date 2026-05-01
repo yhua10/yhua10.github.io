@@ -1,0 +1,317 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OO_Unit2 | yhua10's Blog</title><meta name="author" content="yhua10"><meta name="copyright" content="yhua10"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="OO_Unit2 [TOC] 架构 &amp;&amp; 迭代   在 如何让系统结束 上，我起初采用了递进式 kill：MainCtrl 判定总队列空且已经输入了 NULL，就 kill 自己并把信号传递给所有电梯，电梯接收到 kill 信号后根据自身进度决定什么时候结束。这个方法很不靠谱，导致我互测被刀了。我后来根据水群里大佬们的分享改成了计数器：维护一个 cntRest 之类的东西，+1，-">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OO_Unit2">
+<meta property="og:url" content="https://yhua10.github.io/oo_U2.html">
+<meta property="og:site_name" content="yhua10&#39;s Blog">
+<meta property="og:description" content="OO_Unit2 [TOC] 架构 &amp;&amp; 迭代   在 如何让系统结束 上，我起初采用了递进式 kill：MainCtrl 判定总队列空且已经输入了 NULL，就 kill 自己并把信号传递给所有电梯，电梯接收到 kill 信号后根据自身进度决定什么时候结束。这个方法很不靠谱，导致我互测被刀了。我后来根据水群里大佬们的分享改成了计数器：维护一个 cntRest 之类的东西，+1，-">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yhua10.github.io/img/neww.jpg">
+<meta property="article:published_time" content="2026-05-01T06:50:40.267Z">
+<meta property="article:modified_time" content="2026-04-26T06:45:03.435Z">
+<meta property="article:author" content="yhua10">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yhua10.github.io/img/neww.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/neww.jpg"><link rel="canonical" href="https://yhua10.github.io/oo_U2.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OO_Unit2',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="<%- url_for('/css/custom.css') %>"<meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="bg-animation" id="web_bg" style="background-image: url(https://i.postimg.cc/X7FR4nVj/wei-xin-tu-pian-20260207083752-42-69.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.postimg.cc/fb02jKk1/owl.jpg" alt="Logo"><span class="site-name">yhua10's Blog</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">OO_Unit2</h1></header><main class="layout" id="content-inner"><div id="page"><div class="page-title">OO_Unit2</div><div class="container" id="article-container"><h1>OO_Unit2</h1>
+<p>[TOC]</p>
+<h3 id="架构-迭代">架构 &amp;&amp; 迭代</h3>
+<hr>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="D:\buaa_study\second_year_2\OO\HW8\电梯架构图.png" style="zoom:150%;" />
+<p>在 <strong>如何让系统结束</strong> 上，我起初采用了递进式 kill：<code>MainCtrl</code> 判定总队列空且已经输入了 NULL，就 kill 自己并把信号传递给所有电梯，电梯接收到 kill 信号后根据自身进度决定什么时候结束。这个方法很不靠谱，导致我互测被刀了。我后来根据水群里大佬们的分享改成了计数器：维护一个 <code>cntRest</code> 之类的东西，+1，-1，当 <code>cntRest == 0</code> 并且已经输入了 NULL 就全终止，优雅又省心。</p>
+<h3 id="锁-同步块">锁 &amp;&amp; 同步块</h3>
+<hr>
+<blockquote>
+<p>总结分析三次作业中同步块的设置和锁的选择，并分析锁与同步块中处理语句之间的关系</p>
+</blockquote>
+<h3 id="调度器设计">调度器设计</h3>
+<hr>
+<p>我在 HW6 一共写了 4 种调度器算法，在 HW6 跑了 2000 轮数据排名：影子电梯 &gt; (自由竞争，随机) &gt; 均匀。所以我在 HW7 只迭代了影子电梯。</p>
+<p>我没有尝试纯启发式，但互测的时候看到我们房多数人用了纯启发，不过没有发现性能很好的。不知道有没有人纯启发很成功的。</p>
+<h4 id="均匀分配">均匀分配</h4>
+<p>均匀分配全方位倒第一，所以很快就被淘汰了。</p>
+<h4 id="Random">Random</h4>
+<p>随机性能挺好的（但远远不如影子和自由竞争），而且（&gt;50组数据时）很稳定，但它有一个让人很难受的问题：它没办法设计预定队列，所以想避开一次性维修 5 台电梯压力最后一台电梯只能靠接收上限，但这样写不好容易搞出来轮询。</p>
+<h4 id="自由竞争">自由竞争</h4>
+<p>这是一种下限很低，但上限很高的算法，如果实现的好的话可能仅次于完善的影子电梯。但不知道为什么我写出来的自由竞争显著倾向于节省电量（比影子电梯省 1/3），时间性能不好（比影子电梯多 1/4），后来渐渐放弃了。</p>
+<p>核心思路是计算所有电梯接到这个乘客的时间加以比较。这个方案是如何处理时长与电量之间的关系的？我感到很迷惑。我只是机械的操作了 “计算接到乘客的时长”，我没有想为什么最快接到人的就是最好的。如果说是从 “最快接到” 的角度让 “平均时长” 尽可能的短……可我写出来效果不是这样的。</p>
+<p>自由竞争里也有小模拟，和影子电梯有一点点像，只是轻量很多，也不用起线程。另外这好像是唯一一个能直接反映 “平均时长” 的算法，影子电梯完全没法管 “平均时长“ 的。</p>
+<h4 id="影子电梯">影子电梯</h4>
+<p>这个上限更高，也更让人越优化越绝望。影子电梯理论上可以获取最佳的运行方案，但考虑到不断有乘客到来，影子电梯不可能做到真正的一比一复刻，即使想做到高度复刻也是很困难的。还有 “平均完成时间” 的概念完全无法计算，只能考虑总时长和电量然后研究怎么加权。</p>
+<p>我的影子电梯的核心思路是假设当前乘客是最后一名乘客，计算选中的电梯送完所有人的时间 cost 和耗电量 power。有关 cost 和 power 的权重我想了很久，最终得出的结论是我不应该给 power 任何权重，因为这个 power 跟新加的人相关性实在太小了。（我尝试分别赋 10:0、9:1、8:2、……、1:10 的权重跑了几个 100 轮，跑出来的名次不稳定，但总的来说差距比较小，而且当时我的代码还有 2/1000 左右的 bug，就不了了之了）。</p>
+<p>在 HW6 我的影子电梯运行策略与原电梯完全一致，对于正在维修的电梯，我设置了一个 <code>preQueue</code> 用来存要分配给他但不能输出 RECEIVE 的乘客，这样一来就不存在不能接人的电梯，所以影子电梯的维修时行为也和原电梯完全一致。</p>
+<p>在 HW7，我总共设计了 4 种模拟双轿厢的影子：</p>
+<ul>
+<li>给广义电梯类（或者说电梯井类）也写影子，然后全模拟</li>
+<li>限制电梯的运行范围，然后统计所有没到达目的地的乘客距离目的地的距离，除以 3 （核载人数-1）然后 × 一个数字</li>
+<li>统计 time/perFloor,perPerson</li>
+<li>假设电梯可以运行全程，然后罚时（×权重）</li>
+</ul>
+<p>理论来讲最好的应该是第一种，但我肯定是哪儿写错了，效果不如最后一种。所以说我写了一大圈，最后交的是只需要加半行的策略……所以说影子电梯它很让人绝望。</p>
+<p>不过总的来说性能挺好的。</p>
+<h3 id="手动构造数据策略">手动构造数据策略</h3>
+<hr>
+<p>吸取上一个月的教训，不能完全依赖数据生成器。我采用以下几点策略尽可能地强化数据点。</p>
+<ul>
+<li>压力某一台电梯：通过维修、设计距离之类的方法试着把人逼上同一台电梯，然后就离 RTLE 不远了。</li>
+</ul>
+<h3 id="bugs">bugs</h3>
+<hr>
+<p>在 HW5 强测出现一个 bug，互测也是同一个 bug；HW6 互测出现一个 bug；HW7 没有 bug。</p>
+<h4 id="HW5-强测-互测">HW5 强测 &amp;&amp; 互测</h4>
+<p>强测 WA 了一个点。很奇怪。在电梯月 WA 了。</p>
+<p>问题出在：<strong>必须先 RECEIVE 后加入队列！！！</strong></p>
+<p>我猜测这个限制或许是为了 ban 掉量子电梯抢跑，因为如果不强制要求先 RECEIVE 后采取任何行动的话，评测机无法得知在 RECEIVE 乘客前的那 0.4s 电梯在做什么，也就是说乘客可以同时 向上/不动/向下（薛定谔的量子电梯），而且这似乎是唯一一种确定可以提升效率的量子电梯。但它也同时 ban 掉了先加入队列后输出 RECEIVE 的人，因为加入队列后电梯就可以行动了，但这时可能还没来得及输出 RECEIVE。于是我这个二百五就这样被打了。</p>
+<p>当然虽然这个点真的很蠢，但我会 WA 根本上还是因为不习惯从多线程的角度思考问题，对并行中可能出现的问题不够敏感（是完全没有知觉，我天真的以为搞定同步互斥问题就 ok 了），不然也不会在题目明确要求的情况下仍然随随便便写这两行代码。</p>
+<p>不难发现，当时我的评测机也并没有针对 RECEIVE 顺序的测试。</p>
+<h4 id="课下-bug-0">课下 bug 0</h4>
+<p>我在 HW6 及以前没有给电梯设任何楼层范围的限制（按理说用不着），但测试 HW6 的时候莫名卡死。经检查发现竟然是我的影子电梯飞天遁地了！因为电梯快照照的不同步导致出现了 <code>weight != 0</code> 但 <code>destMap</code> 空着的尴尬情况，我的 LOOK 又是很纯粹的接不到反向乘客、<code>weight</code> 不为 0 就一直走的 LOOK，根本停不下来……</p>
+<p>解决方案：我把电梯快照改成了原子操作，这样虽然保证不了分配策略拿到最新数据，但起码能正常运行结束了，顶多就是数据不够新导致策略不太好。</p>
+<h4 id="课下-bug-1">课下 bug 1</h4>
+<p>这个 bug 没有以任何形式被测出来，是我静态臆想出来的，所以我不确定它是否真的有问题或者有可能被打到。</p>
+<p>我继承自 HW5 的代码中，系统结束过程是递进式的：<code>MainCtrl</code> 判定总队列空且已经输入了 NULL，就 kill 自己把信号传递给所有电梯，电梯接收到 kill 信号后根据自身进度决定什么时候结束。这样在 HW5 很好，但在 HW6 不行，因为我处理维修电梯中乘客的方法是把它们丢回总队列，设想：</p>
+<p>输入的最后一句是 MAINT 6 号电梯，<code>MainCtrl</code> 将该信号传递给 6 号电梯后自杀，6 号电梯歇了一会儿后开门把人都撵回主队列，结果发现主队列已经不复存在了，可怜的乘客成了孤魂野鬼。</p>
+<p>解决方案是在 <code>MainCtrl</code> 的判定条件中加入当前是否有电梯在维修。不幸的是，这个解决方案引入了新的 bug：</p>
+<h4 id="HW6-强测-互测">HW6 强测 &amp;&amp; 互测</h4>
+<p>强测侥幸过了，互测被刀了 14 刀，玉衡星来给大家发福利啦 😉。</p>
+<p>被刀中的原因是死锁。这个死锁来的猝不及防，因为我其实是地毯式检查过死锁的，但不幸的是这个死锁是在检查之后被引入的……</p>
+<p>我的 <code>MainCtrl</code> 里有这样一段代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Person</span> <span class="variable">person</span> <span class="operator">=</span> mainWaitQueue.getaRequest(); <span class="comment">// 从总队列里取一个人</span></span><br><span class="line"><span class="keyword">if</span> (person == <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (validElevatorLock) &#123; <span class="comment">// 检查一下是不是在检修，否则可能最后一个人刚下电梯，MainCtrl 就下班了</span></span><br><span class="line">        <span class="keyword">while</span> (hasMaintainingElevator()) &#123;</span><br><span class="line">            ......</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个 <code>hasMaintainingElevator</code> 调用了 <code>synchronized boolean isMaintaining()</code>，而 <code>validElevatorLock</code> 是个全局变量锁，这样就诞生了一个教科书式的所顺序反转。而这个 <code>validElevatorLock</code> 是我在 debug 过程中加入的，目的是维护 “整个系统中是否有电梯正在维修” 状态的一致性，设置这个状态的目的是为了解决 bug1。</p>
+<p>或许可以靠顺序修改解决这个问题，但我在修改的时候看到群里有人说采用计数器的方法来停掉 MainCtrl，也就是从根本上改掉我那个不靠谱的递进式 kill，这个方法明显比我那个优雅的多，所以我改成了计数器，这个修改让我得以顺利度过 HW7。</p>
+<h4 id="HW7-强测-互测">HW7 强测 &amp;&amp; 互测</h4>
+<p>没有刀，但其实有一处很危险。</p>
+<p>因为我的影子电梯是可以预定的，在维修状态的电梯可以把人收进预队列里，所以我就没写一个电梯接受人数上限的设置。但我的双轿厢罚时设计的不好，所以 5 台电梯升级加同时爆发大量请求可以把人都逼到同一台电梯里，最长可达 180.059 s 左右。不难想象这个点有多难打，不知道是不是有人发现了但刀不中。</p>
+<p>HW7 房间有个人大约有 15% 的数据点维修超时或者升级超时，但我始终没能刀中。</p>
+<h3 id="线程安全-层次化设计">线程安全 &amp;&amp; 层次化设计</h3>
+<hr>
+<ul>
+<li>没有绝对安全的线程……当然是假的，但我 de 同步问题 de 的很痛苦。</li>
+<li>或许可以给电梯设计一个基类，然后让 1~6 电梯和影子电梯都继承它，这样就不要每次都费劲让它们保持一致了。</li>
+</ul>
+<h3 id="大模型">大模型</h3>
+<hr>
+<ul>
+<li>GPT 从 HW5 开始写的评测机和数据生成器，一直写到 HW7。每次把迭代内容输入/输出、数据强化思路总结给它。好处是写的快、省事儿而且足够强，坏处是从 HW6 开始我就看不懂也懒得看了。这个评测机测出了我绝大多数的 bug，从 5/100 RTLE 到 10000/10000 AC。</li>
+<li>我让 GPT 写了一个根据输入/错误的输出自动生成格式化报告的程序，总结出程序结束（其实是卡死）时 <code>MainQueue</code> 中的人和所有电梯没送完的人，以便于检查死锁。</li>
+<li>代码是古法的。</li>
+</ul>
+<h3 id="心得体会">心得体会</h3>
+<hr>
+<h3 id="可能的建议">可能的建议</h3>
+<hr>
+<ul>
+<li>诚挚地建议提高电梯月互测中的代码运行次数，哪怕 2 次也可以……刀不到的 bug 太难受了……这样也可以变相减少总的提交次数</li>
+<li>希望有关 “恶意 hack 同质 bug” 可以有 <strong>更明确的说明</strong>，比如 <strong>保证在被判定为恶意 hack 之前会有助教联系确认情况</strong> 之类的……因为很多时候都存在：“A 和 B 有相同的问题，但 A 的问题更严重，我可能永远刀不到 B，但我会稳定地误伤 A” 的问题。</li>
+<li>助教哥哥姐姐们辛苦了。</li>
+</ul>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yhua10</div><div class="author-info-description">及时行乐吧 :)</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yhua10" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">神灯祝你好梦，阿拉丁先睡了</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="神秘 bug"/></a><div class="content"><a class="title" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug">神秘 bug</a><time datetime="2026-03-29T15:44:25.224Z" title="Created 2026-03-29 23:44:25">2026-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/27/oo_U1/" title="OO_Unit1"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OO_Unit1"/></a><div class="content"><a class="title" href="/2026/03/27/oo_U1/" title="OO_Unit1">OO_Unit1</a><time datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:48.000Z" title="Created 2026-01-23 00:55:48">2026-01-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cscore/"><span class="card-category-list-name">cscore</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/else/"><span class="card-category-list-name">else</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E4%BA%8B%E6%83%85/" style="font-size: 1.1em; color: #999">一些有趣的事情</a> <a href="/tags/BUAA-OO/" style="font-size: 1.1em; color: #999">BUAA_OO</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/03/">
+            <span class="card-archive-list-date">
+              March 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/01/">
+            <span class="card-archive-list-date">
+              January 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yhua10</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script><meting-js server="netease" type="playlist" id="3778678" fixed="true" autoplay="false"></meting-js><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>

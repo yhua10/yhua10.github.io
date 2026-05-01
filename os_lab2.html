@@ -1,0 +1,471 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>OS_lab2 | yhua10's Blog</title><meta name="author" content="yhua10"><meta name="copyright" content="yhua10"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="思考题  Thinking 2.1 请根据上述说明，回答问题：在编写的 C 程序中，指针变量中存储的地址被视为虚拟地址，还是物理地址？MIPS 汇编程序中 lw 和 sw 指令使用的地址被视为虚拟地址，还是物理地址？  都是虚拟地址。   Thinking 2.2 请思考下述两个问题：   从可重用性的角度，阐述用宏来实现链表的好处。   查看实验环境中的 &#x2F;usr&#x2F;include&#x2F;sys&#x2F;que">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OS_lab2">
+<meta property="og:url" content="https://yhua10.github.io/os_lab2.html">
+<meta property="og:site_name" content="yhua10&#39;s Blog">
+<meta property="og:description" content="思考题  Thinking 2.1 请根据上述说明，回答问题：在编写的 C 程序中，指针变量中存储的地址被视为虚拟地址，还是物理地址？MIPS 汇编程序中 lw 和 sw 指令使用的地址被视为虚拟地址，还是物理地址？  都是虚拟地址。   Thinking 2.2 请思考下述两个问题：   从可重用性的角度，阐述用宏来实现链表的好处。   查看实验环境中的 &#x2F;usr&#x2F;include&#x2F;sys&#x2F;que">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://yhua10.github.io/img/neww.jpg">
+<meta property="article:published_time" content="2026-05-01T06:50:40.269Z">
+<meta property="article:modified_time" content="2026-04-17T05:32:02.867Z">
+<meta property="article:author" content="yhua10">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yhua10.github.io/img/neww.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/neww.jpg"><link rel="canonical" href="https://yhua10.github.io/os_lab2.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OS_lab2',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="<%- url_for('/css/custom.css') %>"<meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="bg-animation" id="web_bg" style="background-image: url(https://i.postimg.cc/X7FR4nVj/wei-xin-tu-pian-20260207083752-42-69.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://i.postimg.cc/fb02jKk1/owl.jpg" alt="Logo"><span class="site-name">yhua10's Blog</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">OS_lab2</h1></header><main class="layout" id="content-inner"><div id="page"><div class="page-title">OS_lab2</div><div class="container" id="article-container"><h1>思考题</h1>
+<blockquote>
+<p><strong>Thinking 2.1</strong></p>
+<p>请根据上述说明，回答问题：在编写的 C 程序中，指针变量中存储的地址被视为虚拟地址，还是物理地址？MIPS 汇编程序中 lw 和 sw 指令使用的地址被视为虚拟地址，还是物理地址？</p>
+</blockquote>
+<p>都是虚拟地址。</p>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.2</strong> 请思考下述两个问题：</p>
+<ul>
+<li>
+<p>从可重用性的角度，阐述用宏来实现链表的好处。</p>
+</li>
+<li>
+<p>查看实验环境中的 <code>/usr/include/sys/queue.h</code>，了解其中单向链表与循环链表的实现，比较它们与本实验中使用的双向链表，分析三者在插入与删除操作上的性能差异。</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>从可重用性角度……它可以重用。链表宏并非针对一种特定数据类型的链表，而是针对 “侵入式的双向链表”，约定了一套调用接口。如果我想在 Page 之外另开一种数据结构也一样能用。</li>
+<li>从插入、删除、遍历角度，双向链表都很有优势，最大的不足是空间开销和维护开销，但好像 “侵入式”链表在某种程度上弱化了这个问题。</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.3</strong></p>
+</blockquote>
+<p>选 C。</p>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.4</strong></p>
+<ul>
+<li>
+<p>请阅读上面有关 TLB 的描述，从虚拟内存和多进程操作系统的实现角度，阐述 ASID的必要性。</p>
+</li>
+<li>
+<p>请阅读 MIPS 4Kc 文档《MIPS32® 4K™ Processor Core Family Software User’sManual》的 Section 3.3.1 与 Section 3.4，结合 ASID 段的位数，说明 4Kc 中可容纳不同的地址空间的最大数量。</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>
+<p>每个虚拟地址空间对应一个 asid，每个进程对应一个虚拟地址空间。因为所有的虚拟空间其实都是运行在同一片有限的物理空间上，切换进程后，所有的映射都需要换，asid 是这个开关。</p>
+<p>否则必须在进程切换的时候刷新 TLB，开销极大，在页片轮转下无法承受。</p>
+</li>
+<li>
+<p>根据 MIPS32 4Kc 手册，在 MIPS 的 CP0 寄存器中的 <code>EntryHi</code> 寄存器中包含 ASID 的位宽为 8，so，256。</p>
+</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.5</strong></p>
+<ul>
+<li>
+<p>tlb_invalidate 和 tlb_out 的调用关系？</p>
+</li>
+<li>
+<p>请用一句话概括 tlb_invalidate 的作用。</p>
+</li>
+<li>
+<p>逐行解释 tlb_out 中的汇编代码。</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>
+<p><code>tlb_out</code> 是底层汇编实现，<code>tlb_invalidate</code> 是上层 C 语言接口。</p>
+</li>
+<li>
+<p><code>tlb_invalidate</code> 用于删除指定 ASID 和虚拟地址对应的 TLB 表项。将 ASID 指定地址空间中某个虚拟地址对应的 TLB 缓存项失效，避免 CPU 继续使用过期的地址映射。</p>
+</li>
+<li>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">LEAF(tlb_out)           # 函数开始</span><br><span class="line">.set noreorder          # 禁止重排</span><br><span class="line">mfc0    t0, CP0_ENTRYHI # 保存 EntryHi</span><br><span class="line">mtc0    a0, CP0_ENTRYHI # 写入目标项</span><br><span class="line">nop                     # 等待生效</span><br><span class="line">tlbp                    # 查找 TLB 项</span><br><span class="line">nop                     # 等待结果</span><br><span class="line">mfc0    t1, CP0_INDEX   # 读索引结果</span><br><span class="line">bltz    t1, NO_SUCH_ENTRY # 未命中则跳转</span><br><span class="line">mtc0    zero, CP0_ENTRYLO0 # 清偶页项</span><br><span class="line">mtc0    zero, CP0_ENTRYLO1 # 清奇页项</span><br><span class="line">nop                        # 等待生效</span><br><span class="line">tlbwi                   # 写回失效项</span><br><span class="line">NO_SUCH_ENTRY:          # 结束标签</span><br><span class="line">mtc0    t0, CP0_ENTRYHI # 恢复 EntryHi</span><br><span class="line">jr      ra              # 返回</span><br><span class="line">nop                     # 延迟槽</span><br><span class="line">END(tlb_out)            # 函数结束</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.6</strong></p>
+<p>请结合 Lab2 开始的 CPU 访存流程与下图中的 Lab2 用户函数部分，尝试将函数调用与 CPU 访存流程对应起来，思考函数调用与 CPU 访存流程的关系。</p>
+</blockquote>
+<p>函数调用是软件层对程序执行的抽象，而其每一步操作（取指、访存）都通过 CPU 的虚拟地址访问机制完成，本质上函数调用过程就是一系列受 TLB 和页表管理的访存操作。</p>
+<hr>
+<blockquote>
+<p><strong>Thinking 2.7</strong> 从下述三个问题中任选其一回答：</p>
+<ul>
+<li>
+<p>简单了解并叙述 X86 体系结构中的内存管理机制，比较 X86 和 MIPS 在内存管理上的区别。</p>
+</li>
+<li>
+<p>简单了解并叙述 RISC-V 中的内存管理机制，比较 RISC-V 与 MIPS 在内存管理上的区别。</p>
+</li>
+<li>
+<p>简单了解并叙述 LoongArch 中的内存管理机制，比较 LoongArch 与 MIPS 在内存管理上的区别。</p>
+</li>
+</ul>
+</blockquote>
+<p>RISC-V 的内存管理机制以标准化多级页表为核心，由 <code>satp</code> 统一描述当前地址空间，硬件按照既定的页表格式完成地址翻译，并通过 <code>SFENCE.VMA</code> 保证页表更新与翻译缓存的一致性；而 MIPS 更强调软件参与的 TLB 管理，TLB miss 后通常通过异常处理程序装入表项，操作系统需要更直接地操纵 TLB 和相关 CP0 寄存器。RISC-V 更偏向“硬件规定页表格式 + 统一翻译接口”，MIPS 更偏向“硬件提供 TLB 机制 + 软件负责 refill 与维护”。</p>
+<h1>链表宏的使用方法</h1>
+<p>GPT 说这里是在用宏模拟泛型。</p>
+<p>这套链表宏是为一类特殊的双向链表设计的，这类链表大概长这样：</p>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/OS/Lab2/lianbiao.png" width="700">
+<p>它和普通双向链表主要有两个区别：① 它的 <code>prev</code> 和 <code>next</code> 属性不是直接裸露在 <code>Node</code> 里的，而是用 <code>LIST_ENTRY</code> 属性封装好再放置于 <code>Node</code> 里的。这样的好处在于一个 <code>Node</code> 可以有不止一个 <code>LIST_ENTRY</code>，也就是可以有不止一组 <code>prev</code> 和 <code>next</code>，也就是这个 <code>Node</code> 可以同时被连进多个链表里（因为一段内存，它可以同时被记录为 free 和 dirty，所以表示内存的结构体需要具备同时处于多个链表中的能力）；② 它的 <code>prev</code> 不是指向前驱节点，而是指向前驱节点的对应 LIST_ENTRY 里的 <code>next</code> 。</p>
+<p>比如说：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Page</span> &#123;</span></span><br><span class="line">    LIST_ENTRY(Page) free_link;</span><br><span class="line">    LIST_ENTRY(Page) active_link;</span><br><span class="line">    LIST_ENTRY(Page) dirty_link;</span><br><span class="line">    u_short pp_ref;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>宏定义展开就是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Page</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> **<span class="title">le_prev</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">le_next</span>;</span></span><br><span class="line">    &#125; free_link;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> **<span class="title">le_prev</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">le_next</span>;</span></span><br><span class="line">    &#125; active_link;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> **<span class="title">le_prev</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">le_next</span>;</span></span><br><span class="line">    &#125; dirty_link;</span><br><span class="line">    u_short pp_ref;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>也就是说，我们根本找不到前一个链表元，我们只能找到前一个链表元的 <code>filed.le_next</code> 字段。</p>
+<p>这样设计是为什么呢？</p>
+<p>我猜，或许有可能，是为了在某个链表元前插入元素的时候，不需要考虑这个链表元的前一个元素是不是链表头。</p>
+<p>如果按照常规的有链表头的双向链表设计，比如现在链表中有一个 A，我们想要在 A 之前插入一个 B，那我们首先要特判 A 的前一项是不是 <code>head</code>，因为向 <code>head</code> 后插入元素的操作和 向普通元素后插入元素的操作是不一样的。</p>
+<p>但是，在这里，不需要。因为我们根本找不到 A 的前一个元素，我们只需要把解引用 A 的 <code>field.le_pre</code> 获得的指针，也就是 A 前一个元素的 <code>field.le_next</code> 字段赋值为 B 就行了。</p>
+<p>一个典型的例子是 <code>LIST_INSERT_BEFORE</code> 宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INSERT_BEFORE(listelm, elm, field)</span></span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">        (elm)-&gt;field.le_next = (listelm);</span><br><span class="line">        (elm)-&gt;field.le_prev = (listelm)-&gt;field.le_prev;</span><br><span class="line">        *((listelm)-&gt;field.le_prev) = (elm); <span class="comment">// 也只有这个操作会用到解引用</span></span><br><span class="line">        (listelm)-&gt;field.le_prev = &amp;((elm)-&gt;field.le_next);</span><br><span class="line">    &#125; <span class="keyword">while</span>(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>前面说到，如果采用一般的链表结构，我们想在 <code>listelm</code> 前插入一个 <code>elm</code>，首先要判断 <code>listelm</code> 之前是不是 <code>head</code>。怎么判断呢？反正我不知道。一般可以给链表项设置一个 <code>is_first</code> 字段，但这里没有，所以 <code>*((listelm)-&gt;field.le_prev) = (elm);</code> 就很好用了。</p>
+<p>对于 exercise 2.2，它暂时只有一组 <code>LIST_ENTRY</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INSERT_AFTER(listelm, elm, field)</span></span><br><span class="line">	<span class="keyword">do</span> &#123;</span><br><span class="line">		LIST_NEXT((elm), field) = LIST_NEXT((listelm), field);</span><br><span class="line">		<span class="keyword">if</span> (LIST_NEXT((elm), field) != <span class="literal">NULL</span>) &#123;</span><br><span class="line">			LIST_NEXT((elm), field)-&gt;field.le_prev = &amp;(LIST_NEXT((elm), field));</span><br><span class="line">		&#125;</span><br><span class="line">		LIST_NEXT((listelm), field) = (elm);</span><br><span class="line">		(elm)-&gt;field.le_prev = &amp;(LIST_NEXT((listelm), field));</span><br><span class="line">	&#125; <span class="keyword">while</span> (<span class="number">0</span>)		</span><br></pre></td></tr></table></figure>
+<p>代码里那个 <code>field</code> 其实就是对应 <code>LIST_ENTRY</code> 的成员名。</p>
+<p>要注意 <code>-&gt;</code> 的优先级比 <code>*</code> 高，所以 <code>LIST_INSERT_BEFORE</code> 里的 <code>*(listelm)-&gt;field.le_prev = (elm); </code> 等价于 <code>*((listelm)-&gt;field.le_prev) = (elm); </code>（</p>
+<hr>
+<h1>页式内存管理</h1>
+<p>先浅看一下 <code>mmu.h</code> 里的宏：</p>
+<p>现在可以知道 MOS 里页面的大小是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>12</mn></msup><mi>B</mi></mrow><annotation encoding="application/x-tex">2^{12}B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>，而一个页目录摊开来的大小（页目录映射的最大范围，也就是一个进程享有的虚拟空间大小）是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup><mi>B</mi></mrow><annotation encoding="application/x-tex">2^{32}B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span>。</p>
+<p>va 的结构是：</p>
+<table>
+<thead>
+<tr>
+<th>PDX：页目录索引</th>
+<th>PTX：页表索引</th>
+<th>offset：页内偏移</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>10</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<p>这里 <code>PDX</code> 和 <code>PTX</code> 的作用就是把相应部分提出来挪到低位（PDX 也 <code>&amp; 0x3FF</code> 了，其实不用吧）。</p>
+<p>一个页表项 32 位，高 20 位是对应物理页框的地址的高 20 位（因为页表头要按 PAGE_SIZE 对齐，所以虚拟地址的低 12 位一定是 0），低 12 位是对应页表的各种权限。PTE_ADDR  和 PTE_FLAGS 分别是为了把这俩提出来。</p>
+<p>PPN 和 VPN 是通过地址求页号。</p>
+<p>下面的几个宏是为了把权限位提出来。跳过。直达 Part3：Our helper functions.</p>
+<p>PADDR 逻辑转物理；（针对 kseg0 里的）</p>
+<p>KADDR 物理转地址；</p>
+<p>就这样吧，剩下的不看了。</p>
+<hr>
+<p>再看一下 <code>pmap.h</code>：</p>
+<p><code>cur_pgdir</code> 始终指向当前生效的地址空间的页目录头部，切换进程的时候地址空间发生改变，<code>cur_pgdir</code> 的指向也会发生改变。它的类型是 <code>Pde*</code>，也就是 <code>unsigned long*</code>，这是在我们的代码中常见的地址指针类型。</p>
+<p><code>LIST_HEAD(Page_list, Page);</code> 定义了一种名字叫做 <code>Page_list</code> 的 macro list 链表，链表项的类型是 <code>Page</code>。</p>
+<p><code>typedef LIST_ENTRY(Page) Page_LIST_entry_t;</code> 给 <code>LIST_ENTRY</code>，也就是那个包装 <code>next</code> 和 <code>*prev</code> 的字段取了个别名叫做 <code>Page_LIST_entry_t</code>。</p>
+<p>然后才定义 <code>Page</code> 结构体（物理页面描述符），展开来看就是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Page</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">le_next</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Page</span> **<span class="title">le_prev</span>;</span></span><br><span class="line">    &#125; pp_link;</span><br><span class="line">    u_short pp_ref;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>GPT 说这个东西叫做物理页面描述符。每个 <code>Page</code> 结构体用于描述一个页面，<code>pp_link</code> 描述当前页是否/是怎样被连到空闲页链表里的，<code>pp_ref</code> 描述当前页被几处引用（对于普通数据页，等价于有多少有效映射指向它；对于页表页、启动阶段占有页等具有特殊用途的页，也可能是手动置 1，比如 <code>page_init</code> 里）主要是为了反映能否把它 free 掉。显然 <code>Page</code> 并非物理页，但是鉴于物理页本身不好描述，用 <code>Page</code> 指代物理页好像也无可厚非。</p>
+<p>注意我们不能真的把物理页面挂在链表里，所以实际上被挂在 <code>Page_list</code> 里的是其对应的页面描述符。</p>
+<p>从 <code>pmap.c</code> 里 extern 来的 <code>Pages</code> 指向物理页面描述符的起点？</p>
+<p><code>page_free_list</code> 是一个 <code>Page_list</code> 类型（刚刚定义的）的链表，用来挂当前闲置页面的描述符。</p>
+<p>函数 <code>page2ppn</code> 用于计算某一页（pp）的物理页号（这里应用了一点 C 语言指针知识）。</p>
+<p>函数 <code>page2pa</code> 用于计算某一页（pp）的物理地址。</p>
+<p>函数 <code>pa2page</code> 与 <code>page2pa</code> 正好反过来，用于寻找某一物理地址对应的页面，返回指向页面头部的指针。</p>
+<p>函数 <code>va2pa</code> 的作用是根据给定的页目录 <code>pgdir</code>，查询虚拟地址 <code>va</code> 当前映射到哪个物理地址。</p>
+<blockquote>
+<p>注意：任何一张页表（页目录或者页表）存储的都只能是物理地址，而 C 语言只能操作逻辑地址。我们用 C 语言操作逻辑地址去读页表，读到的却是物理地址，这或许是代码中 <code>p-&gt;v/v-&gt;p </code>操作如此频繁的原因。</p>
+</blockquote>
+<blockquote>
+<p>这里 ctrl + click，alt + <code>&lt;-</code> 十分有用。</p>
+</blockquote>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/OS/Lab2/page.png" width="700">
+<hr>
+<p>终于到 <code>pmap.c</code> 了：</p>
+<p><code>memsize</code> 是硬件可用内存大小，后面在 <code>mips_detect_memory</code> 里给它赋值为 65536×1024，确实没多大。</p>
+<p><code>npage</code> 是可用物理页数。</p>
+<p><code>cur_pgdir</code> 始终指向当前生效的地址空间的页目录头部，切换进程的时候地址空间发生改变，<code>cur_pgdir</code> 的指向也会发生改变。</p>
+<p><code>pages</code> 指向物理页面描述符数组的起点，<code>struct Page pages[]</code> 的首地址。</p>
+<p><code>freemem</code> 表示未被使用内存段的起始地址。</p>
+<p><code>page_free_list</code> 是用来挂空闲页面描述符的那个链表。</p>
+<p>函数 <code>mips_detect_memory</code> 和 <code>mips_vm_init</code> 负责初始化这个页式存储体系。 <code>mips_detect_memory</code> 加载物理配置，记录硬件可用内存的大小和总物理页数； <code>mips_vm_init</code> 负责建立整个物理内存的描述符表。到此为止，“启动” 已经完成了，剩下的都是一些接口方法。（<s>部分函数实现方法详见下方带注释代码</s> 删了）</p>
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>作用</th>
+<th>参数含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>alloc</code><br />详见下</td>
+<td>分配 n 字节的空间并返回初始的虚拟地址</td>
+<td>align：按 align 向上对齐<br />clear：若 clear 则将这 b 个字节的内存清0</td>
+</tr>
+<tr>
+<td><code>mips_vm_init</code></td>
+<td>给 <code>pages</code> 这个全局数组分配一大块连续内存，用来存放所有物理页对应的 <code>struct Page</code> 描述符</td>
+<td></td>
+</tr>
+<tr>
+<td><code>page_init</code></td>
+<td>初始化空闲链表<br />把已经用过的内存标记为非空闲（系统占用）<br />剩下的都挂在 page_free_list 里</td>
+<td></td>
+</tr>
+<tr>
+<td><code>page_alloc</code></td>
+<td>分配一页，把这页内存清0</td>
+<td>*new：指向待分配页描述符的指针<br />传入的是指向 *new 的指针，以便在函数中修改 *new</td>
+</tr>
+<tr>
+<td><code>page_free</code></td>
+<td>把一页确认空闲的页面（描述符）挂进 page_free_list</td>
+<td>看起来要是不小心把非空闲页面 free 了还会报错？</td>
+</tr>
+<tr>
+<td><code>pgdir_walk</code><br />详见下</td>
+<td>根据给出的页目录和 va 求页表项地址，把指针存进 *ppte<br />返回 0 成功，返回错误码失败</td>
+<td>pgdir：指向页目录的指针<br />va：虚拟地址<br />creat：若页面不存在，是否创建页面</td>
+</tr>
+<tr>
+<td><code>page_insert</code><br />详见下<br /></td>
+<td>将 pp 对应页映射到 va，并将页表项权限设置为 perm</td>
+<td>pgdir：指向页目录的指针<br />asid：地址空间标识符<br />pp：待映射的物理页<br />va：目标虚拟地址<br />perm：权限</td>
+</tr>
+<tr>
+<td><code>page_lookup</code><br />详见下</td>
+<td>查询 va 当前映射到的物理页，将物理页对应的PTE地址写入 *ppte，然后返回物理页的描述符</td>
+<td>*ppte：写入的目标</td>
+</tr>
+<tr>
+<td><code>page_decref</code></td>
+<td>将 <code>pp</code> 页映射数减一，如果减到 0 就 free 它</td>
+<td></td>
+</tr>
+<tr>
+<td><code>page_remove</code><br />详见下</td>
+<td>取消映射</td>
+<td>asid：地址空间标识符</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>自映射</h1>
+<p>extra 考了自映射，啥也不会喜提  30 分。课下（抢在lmh学长开播之前）自己完成了题目（力竭了）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">create_self_map</span><span class="params">(Pde *pgdir, u_int asid, u_long base)</span> &#123;</span><br><span class="line">	<span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">/* Your Code Here (1/4) */</span></span><br><span class="line">	u_long va = base;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Page</span> *<span class="title">pp</span>;</span></span><br><span class="line">	Pte *pte;</span><br><span class="line">	<span class="keyword">for</span> (va; va &lt; base + <span class="number">1024</span> * PAGE_SIZE; va += PAGE_SIZE) &#123;</span><br><span class="line">		pp = page_lookup(pgdir, va, &amp;pte);</span><br><span class="line">		<span class="keyword">if</span> (pp) &#123;</span><br><span class="line">			page_remove(pgdir, asid, va);</span><br><span class="line">			count ++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// pgdir[PDX(base)] = (PADDR(pgdir) | PTE_V) &amp; (~PTE_D);</span></span><br><span class="line">    <span class="comment">// 我发现这个其实不需要，因为 PADDR 低 12 位本来就是 0</span></span><br><span class="line">	pgdir[PDX(base)] = (PADDR(pgdir) | PTE_V);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">u_long <span class="title function_">pte_va</span><span class="params">(u_long base, u_int pdeno, u_int pteno)</span> &#123;</span><br><span class="line">	<span class="comment">/* Your Code Here (2/4) */</span></span><br><span class="line">	<span class="keyword">return</span> base + (pdeno &lt;&lt; <span class="number">12</span>) + (pteno &lt;&lt; <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">u_long <span class="title function_">pde_va</span><span class="params">(u_long base, u_int pdeno)</span> &#123;</span><br><span class="line">	<span class="comment">/* Your Code Here (3/4) */</span></span><br><span class="line">	<span class="keyword">return</span> base + (base &gt;&gt; <span class="number">10</span>) + (pdeno &lt;&lt; <span class="number">2</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">remove_all_self_map</span><span class="params">(Pde *pgdir, u_int asid)</span> &#123;</span><br><span class="line">	<span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">/* Your Code Here (4/4) */</span></span><br><span class="line">	Pde *pde;</span><br><span class="line">	u_long i;</span><br><span class="line">	u_long base;</span><br><span class="line">	u_long va;</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">1ll</span> &lt;&lt; <span class="number">10</span>; i ++) &#123;</span><br><span class="line">		pde = (Pde *)pgdir + i;</span><br><span class="line">		<span class="keyword">if</span> (pde &amp;&amp; (*pde &amp; PTE_V) &amp;&amp; PTE_ADDR(*pde) == PADDR(pgdir)) &#123;</span><br><span class="line">			*pde = <span class="number">0</span>;</span><br><span class="line">			count ++;</span><br><span class="line">			base = i &lt;&lt; <span class="number">22</span>;</span><br><span class="line">			<span class="keyword">for</span> (va = base; va &lt; base + (PAGE_SIZE &lt;&lt; <span class="number">10</span>); va += PAGE_SIZE) &#123;</span><br><span class="line">				tlb_invalidate(asid, va);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1>实验体会</h1>
+<p>这是我非常非常喜欢的一个 Lab，我把所有链表宏都整理出来功能然后快乐的手敲了一遍，因为我很喜欢写链表操作特别是 C 语言里面的链表操作，感觉回忆起了学数据结构的时候读/写各种奇怪的结构的链表自娱自乐的经历，MOS 里这个链表（GPT 说它叫 侵入式双向链表）要是放在我当时收集的 “奇形怪状的链表集合” 里也是个很有趣的收藏了。毕竟它既能 “不经过前序节点同意”自行换人，又能一个节点同时处于好几条链表里。</p>
+<p>上机前一周就讲到了自映射，学的很潦草，现在好了，老师两个星期都没给我讲明白的事，OS 实验一晚上就给我整明白了。</p>
+<hr>
+<p>人类原创。</p>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/neww.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">yhua10</div><div class="author-info-description">及时行乐吧 :)</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/yhua10" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/mailto%203066659809@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">神灯祝你好梦，阿拉丁先睡了</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/moon.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="神秘 bug"/></a><div class="content"><a class="title" href="/2026/03/29/%E7%A5%9E%E7%A7%98bug/" title="神秘 bug">神秘 bug</a><time datetime="2026-03-29T15:44:25.224Z" title="Created 2026-03-29 23:44:25">2026-03-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/27/oo_U1/" title="OO_Unit1"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/11.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OO_Unit1"/></a><div class="content"><a class="title" href="/2026/03/27/oo_U1/" title="OO_Unit1">OO_Unit1</a><time datetime="2026-03-26T16:19:00.492Z" title="Created 2026-03-27 00:19:00">2026-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/23/hello-world/" title="Hello World"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/else.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2026/01/23/hello-world/" title="Hello World">Hello World</a><time datetime="2026-01-22T16:55:48.000Z" title="Created 2026-01-23 00:55:48">2026-01-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
+            <i class="fas fa-folder-open"></i>
+            <span>Categories</span>
+            
+          </div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/cscore/"><span class="card-category-list-name">cscore</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/else/"><span class="card-category-list-name">else</span><span class="card-category-list-count">1</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B8%80%E4%BA%9B%E6%9C%89%E8%B6%A3%E7%9A%84%E4%BA%8B%E6%83%85/" style="font-size: 1.1em; color: #999">一些有趣的事情</a> <a href="/tags/BUAA-OO/" style="font-size: 1.1em; color: #999">BUAA_OO</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/03/">
+            <span class="card-archive-list-date">
+              March 2026
+            </span>
+            <span class="card-archive-list-count">2</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/01/">
+            <span class="card-archive-list-date">
+              January 2026
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By yhua10</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@6.1.7/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(async () => {
+  const showKatex = () => {
+    document.querySelectorAll('#article-container .katex').forEach(el => el.classList.add('katex-show'))
+  }
+
+  if (!window.katex_js_css) {
+    window.katex_js_css = true
+    await btf.getCSS('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css')
+    if (false) {
+      await btf.getScript('https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js')
+    }
+  }
+
+  showKatex()
+})()</script></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script><meting-js server="netease" type="playlist" id="3778678" fixed="true" autoplay="false"></meting-js><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="local-search-input"><input placeholder="Search..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.3"></script></div></div></body></html>
